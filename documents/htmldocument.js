@@ -53,8 +53,10 @@ define(function(require, exports, module) {
                 tab = t;
                 doc = tab.document;
                 
+                
                 // Listen for change in the document
-                doc.undoManager.on("change", update, plugin);
+                var session = doc.getSession().session;
+                session.on("change", function(e){ update(e.data); });
                 
                 // Listen for a tab close event
                 tab.on("close", function(){ watcher.watch(path); });
@@ -64,13 +66,14 @@ define(function(require, exports, module) {
             }
             
              /** Triggered on change by the editor */
-            function update(){
+            function update(changes){
                 // Calculate changes
                 
                 // Only handles attribute changes currently.
                 // TODO: text changes should be easy to add
                 // TODO: if new tags are added, need to instrument them
-                var result = HTMLInstrumentation.getUnappliedEditList(editor, change);
+                var session = doc.getSession().session;
+                var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
                 if (result.edits) {
                     transports.forEach(function(transport){
