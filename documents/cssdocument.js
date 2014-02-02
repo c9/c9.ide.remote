@@ -54,6 +54,7 @@ define(function(require, exports, module) {
                 tab = t;
                 
                 if (!tab) {
+                    doc = null;
                     fs.readFile(path, function(err, data){
                         update(null, data);
                     });
@@ -61,6 +62,10 @@ define(function(require, exports, module) {
                 }
                 
                 doc = tab.document;
+                var session = doc.getSession().session;
+                
+                // Listen for cursor position change
+                session.selection.on("changeCursor", updateHighlight);
                 
                 // Listen for change in the document
                 doc.undoManager.on("change", update, plugin);
@@ -70,6 +75,36 @@ define(function(require, exports, module) {
                 
                 if (doc.changed)
                     update();
+            }
+            
+            var lastQuery;
+            var reCssQuery = /(^|.*\})(.*)\{|\}/;
+            function updateHighlight(e){
+                if (!tab) return;
+                
+                var session = doc.getSession().session;
+                var lines   = session.doc.getAllLines();
+                var cursor  = session.selection.lead;
+                
+                var line = lines[cursor.row].substr(0, cursor.column);
+                
+                var query;
+                if (line.match(reCssQuery))
+                    query = RegExp.$2;
+                else {
+                    for (var i = cursor.row - 1; i >= 0; i--) {
+                        if (lines[i].match(reCssQuery)) {
+                            query = RegExp.$2;
+                            break;
+                        }
+                    }
+                }
+                
+                if (lastQuery == query) return;
+                
+                transports.forEach(function(transport){
+                    transport.highlightCSSQuery(query);
+                });
             }
             
             function remove(){

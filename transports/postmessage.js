@@ -121,6 +121,15 @@ define(function(require, exports, module) {
                 
             }
             
+            function highlightCSSQuery(query){
+                var message = {
+                    id      : sessionId,
+                    type    : "highlight",
+                    query   : query
+                };
+                source.postMessage(message, "*");
+            }
+            
             /***** Lifecycle *****/
             
             plugin.on("load", function() {
@@ -192,7 +201,12 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
-                deleteScript: deleteScript
+                deleteScript: deleteScript,
+                
+                /**
+                 * 
+                 */
+                highlightCSSQuery: highlightCSSQuery
             });
             
             plugin.load("postmessage" + counter++)

@@ -23,28 +23,24 @@ define(function(require, exports, module) {
             if (loaded) return false;
             loaded = true;
             
-            // watcher.on("delete", function(e){
-            //     var info = isKnownFile(e.path);
-            //     if (info) {
-            //         info.del = true;
-            //         update(null, info);
-                    
-            //         doc.remove();
-            //         // doc.unload();
-            //     }
-            // }, plugin);
+            watcher.on("delete", function(e){
+                var doc = documents[e.path];
+                if (!doc || doc.tab) return;
+                
+                doc.remove();
+                
+                //@todo
+                // doc.unload() ?? 
+            }, plugin);
             
-            // watcher.on("change", function(e){
-            //     var info = isKnownFile(e.path);
-            //     if (info) {
-            //         var tab = tabManager.findTab(e.path);
-            //         if (!tab) {
-            //             fs.readFile(e.path, function(err, data){
-            //                 update({ value: data }, info);
-            //             });
-            //         }
-            //     }
-            // }, plugin);
+            watcher.on("change", function(e){
+                var doc = documents[e.path];
+                if (!doc || doc.tab) return;
+                
+                fs.readFile(e.path, function(err, data){
+                    doc.update(null, data);
+                });
+            }, plugin);
             
             // Listen for opening files
             tabManager.on("open", function(e){

@@ -57,6 +57,7 @@ define(function(require, exports, module) {
                 tab = t;
                 
                 if (!tab) {
+                    doc = null;
                     fs.readFile(path, function(err, data){
                         update(null, data);
                     });
@@ -66,8 +67,10 @@ define(function(require, exports, module) {
                 doc = tab.document;
                 
                 // Listen for change in the document
-                var session = doc.getSession().session;
-                session.on("change", function(e){ update(e.data); });
+                var c9session = doc.getSession();
+                c9session.on("init", function(e){
+                    e.session.on("change", function(e){ update(e.data); });
+                });
                 
                 // Listen for a tab close event
                 tab.on("close", function(){ watcher.watch(path); });
@@ -79,6 +82,7 @@ define(function(require, exports, module) {
              /** Triggered on change by the editor */
             function update(changes, value){
                 // Calculate changes
+                if (!changes) return; //@todo allow only value to be set
                 
                 // Only handles attribute changes currently.
                 // TODO: text changes should be easy to add
