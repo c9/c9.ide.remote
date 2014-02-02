@@ -83,7 +83,7 @@ define(function(require, exports, module) {
                 if (!tab) return;
                 
                 var session = doc.getSession().session;
-                var lines   = session.doc.getAllLines();
+                var lines   = session.doc.$lines;
                 var cursor  = session.selection.lead;
                 
                 var line = lines[cursor.row].substr(0, cursor.column);

@@ -40,6 +40,10 @@ define(function(require, exports, module) {
                     if (e.data.message == "exec") {
                         commands.exec(e.data.command);
                     }
+                    else if (e.data.message == "callback") {
+                        callbacks[e.data.cb](e.data.data);
+                        delete callbacks[e.data.cb];
+                    }
                     else if (e.data.message == "focus") {
                         emit("focus");
                     }
@@ -69,6 +73,11 @@ define(function(require, exports, module) {
             
             /***** Methods *****/
             
+            var callbacks = [];
+            function wrapCallback(callback){
+                return callbacks.push(callback) - 1;
+            }
+            
             function getSources(callback){
                 return callback(null, {
                     styleSheets : styleSheets,
@@ -81,8 +90,13 @@ define(function(require, exports, module) {
                 
             }
             
-            function getHTMLDocument(){
-                
+            function getHTMLDocument(callback){
+                var message = {
+                    id      : sessionId,
+                    type    : "simpledom",
+                    cb      : wrapCallback(callback)
+                };
+                source.postMessage(message, "*");
             }
             
             function getScript(){
@@ -99,8 +113,13 @@ define(function(require, exports, module) {
                 source.postMessage(message, "*");
             }
             
-            function processDOMChanges(){
-                
+            function processDOMChanges(edits){
+                var message = {
+                    id      : sessionId,
+                    type    : "domedits",
+                    edits   : edits
+                };
+                source.postMessage(message, "*");
             }
             
             function updateScript(){
