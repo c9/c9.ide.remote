@@ -10,6 +10,8 @@ define(function(require, exports, module) {
         var remote   = imports.remote;
         var watcher  = imports.watcher;
         
+        var counter = 0;
+        
         function CSSDocument(path){
             var exists = remote.findDocument(path);
             if (exists) return exists;
@@ -48,6 +50,8 @@ define(function(require, exports, module) {
             function initTab(t){
                 if (tab) throw new Error("Tab has already been defined");
                 tab = t;
+                if (!tab) return;
+                
                 doc = tab.document;
                 
                 // Listen for change in the document
@@ -118,6 +122,11 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
+                addTransport: addTransport,
+                
+                /**
+                 * 
+                 */
                 remove: remove,
                 
                 /**
@@ -125,6 +134,8 @@ define(function(require, exports, module) {
                  */
                 update: update
             });
+            
+            plugin.load("cssdocument" + counter++);
             
             return plugin;
         }

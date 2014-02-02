@@ -11,7 +11,9 @@ define(function(require, exports, module) {
         var watcher  = imports.watcher;
         
         var HTMLInstrumentation 
-            = require("../c9.ide.language.html.diff/HTMLInstrumentation");
+            = require("../../c9.ide.language.html.diff/HTMLInstrumentation");
+        
+        var counter = 0;
         
         function HTMLDocument(path){
             var exists = remote.findDocument(path);
@@ -51,8 +53,9 @@ define(function(require, exports, module) {
             function initTab(t){
                 if (tab) throw new Error("Tab has already been defined");
                 tab = t;
-                doc = tab.document;
+                if (!tab) return;
                 
+                doc = tab.document;
                 
                 // Listen for change in the document
                 var session = doc.getSession().session;
@@ -171,8 +174,15 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
+                addTransport: addTransport,
+                
+                /**
+                 * 
+                 */
                 update: update
             });
+            
+            plugin.load("htmldocument" + counter++);
             
             return plugin;
         }

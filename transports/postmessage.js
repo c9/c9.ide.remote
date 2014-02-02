@@ -2,7 +2,7 @@ define(function(require, exports, module) {
     main.consumes = [
         "Plugin", "commands", "c9"
     ];
-    main.provides = ["remote.postmessage"];
+    main.provides = ["remote.PostMessage"];
     return main;
 
     function main(options, imports, register) {
@@ -15,8 +15,9 @@ define(function(require, exports, module) {
             HTMLURL = location.protocol + "//" + location.host + HTMLURL;
         var previewOrigin = HTMLURL.match(/^(?:[^\/]|\/\/)*/)[0];
         
+        var counter = 0;
+        
         function PostMessage(iframe, sessionId){
-            
             /***** Initialization *****/
             
             var plugin = new Plugin("Ajax.org", main.consumes);
@@ -69,7 +70,7 @@ define(function(require, exports, module) {
             /***** Methods *****/
             
             function getSources(callback){
-                return callback({
+                return callback(null, {
                     styleSheets : styleSheets,
                     scripts     : scripts,
                     html        : html
@@ -151,6 +152,11 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
+                getSources: getSources,
+                
+                /**
+                 * 
+                 */
                 getStyleSheet: getStyleSheet,
                 
                 /**
@@ -189,11 +195,13 @@ define(function(require, exports, module) {
                 deleteScript: deleteScript
             });
             
+            plugin.load("postmessage" + counter++)
+            
             return plugin;
         }
         
         register(null, {
-            "remote.postmessage": PostMessage
+            "remote.PostMessage": PostMessage
         });
     }
 });
