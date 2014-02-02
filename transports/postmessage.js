@@ -113,6 +113,16 @@ define(function(require, exports, module) {
                 source.postMessage(message, "*");
             }
             
+            function updateStyleRule(url, rule){
+                var message = {
+                    id      : sessionId,
+                    type    : "stylerule",
+                    url     : url,
+                    rule    : rule
+                };
+                source.postMessage(message, "*");
+            }
+            
             function processDOMChanges(edits){
                 var message = {
                     id      : sessionId,
@@ -201,6 +211,11 @@ define(function(require, exports, module) {
                  * 
                  */
                 updateStyleSheet: updateStyleSheet,
+                
+                /**
+                 * 
+                 */
+                updateStyleRule: updateStyleRule,
                 
                 /**
                  * 

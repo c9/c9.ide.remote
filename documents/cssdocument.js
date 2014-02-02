@@ -62,13 +62,15 @@ define(function(require, exports, module) {
                 }
                 
                 doc = tab.document;
-                var session = doc.getSession().session;
                 
-                // Listen for cursor position change
-                session.selection.on("changeCursor", updateHighlight);
-                
-                // Listen for change in the document
-                doc.undoManager.on("change", update, plugin);
+                var c9session = doc.getSession();
+                c9session.on("init", function(e){
+                    // Listen for change in the document
+                    e.session.on("change", function(e){ update(e.data); });
+                    
+                    // Listen for cursor position change
+                    e.session.selection.on("changeCursor", updateHighlight);
+                });
                 
                 // Listen for a tab close event
                 tab.on("close", function(){ watcher.watch(path); });
@@ -101,6 +103,7 @@ define(function(require, exports, module) {
                 }
                 
                 if (lastQuery == query) return;
+                lastQuery = query;
                 
                 transports.forEach(function(transport){
                     transport.highlightCSSQuery(query);
@@ -113,7 +116,77 @@ define(function(require, exports, module) {
                 });
             }
             
+            // var timer, lastValue;
+            // function updateDelayed(changes, value){
+            //     if (!timer) {
+            //         timer = setTimeout(function(){
+            //             timer = null;
+            //             update(null, lastValue);
+            //         }, 30);
+            //     }
+            //     else {
+            //         lastValue = value;
+            //     }
+            // }
+            
             function update(changes, value){
+                // single line
+                // {
+                // action: "insertText" | "removeText"
+                // text: "string"
+                // range: {start, end}
+                // }
+                // multiline
+                // {
+                // action: "insertLines" | "removeLines"
+                // lines: ["string", ...]
+                // range: {start, end}
+                // }
+                
+                var range = changes && changes.range;
+                if (changes && changes.text && range.start.row == range.end.row 
+                  && (changes.text != "insertText" || changes.text.indexOf(";") == -1)) {
+                    var session = doc.getSession().session;
+                    var line    = session.doc.$lines[range.end.row];
+                    var section = changes.action == "insertText"
+                        ? line.substr(range.start.column, range.end.column - range.start.column) //changes.text
+                        : "";
+                    var idx     = section.indexOf(";");
+                    
+                    // Only allow a single rule edit
+                    if (idx == -1 || idx == section.length - 1) {
+                        var char;
+                        if (idx == -1) {
+                            for (var i = range.end.column; i < line.length; i++) {
+                                char = line.charAt(i);
+                                if (char == ";") break;
+                                section += char;
+                            }
+                        }
+                        for (var i = range.start.column - (changes.action == "insertText" ? 1 : 0); i >= 0; i--) {
+                            char = line.charAt(i);
+                            if (char == ";") break;
+                            section = char + section;
+                        }
+                        
+                        var parts = section.split(":");
+                        var key   = parts[0].trim();
+                        var css   = (parts[1] || "").trim();
+                        
+                        var rule = {
+                            selector : lastQuery,
+                            key      : key,
+                            value    : css
+                        };
+                        
+                        transports.forEach(function(transport){
+                            transport.updateStyleRule(path, rule);
+                        });
+                        
+                        return;
+                    }
+                }
+                
                 transports.forEach(function(transport){
                     transport.updateStyleSheet(path, value || doc.value);
                 });
