@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "Plugin", "remote", "watcher"
+        "Plugin", "remote", "watcher", "fs"
     ];
     main.provides = ["HTMLDocument"];
     return main;
@@ -9,6 +9,7 @@ define(function(require, exports, module) {
         var Plugin   = imports.Plugin;
         var remote   = imports.remote;
         var watcher  = imports.watcher;
+        var fs       = imports.fs;
         
         var HTMLInstrumentation 
             = require("../../c9.ide.language.html.diff/HTMLInstrumentation");
@@ -51,9 +52,16 @@ define(function(require, exports, module) {
             }
             
             function initTab(t){
-                if (tab) throw new Error("Tab has already been defined");
+                if (t && tab) 
+                    throw new Error("Tab has already been defined");
                 tab = t;
-                if (!tab) return;
+                
+                if (!tab) {
+                    fs.readFile(path, function(err, data){
+                        update(null, data);
+                    });
+                    return;
+                }
                 
                 doc = tab.document;
                 
@@ -69,7 +77,7 @@ define(function(require, exports, module) {
             }
             
              /** Triggered on change by the editor */
-            function update(changes){
+            function update(changes, value){
                 // Calculate changes
                 
                 // Only handles attribute changes currently.

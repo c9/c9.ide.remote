@@ -52,6 +52,13 @@ define(function(require, exports, module) {
                 var doc = tab.path && documents[tab.path];
                 if (doc) doc.tab = tab;
             }, plugin);
+            
+            // Listen for closing tabs
+            tabManager.on("tabDestroy", function(e){
+                var tab = e.tab;
+                var doc = tab.path && documents[tab.path];
+                if (doc) doc.tab = null;
+            }, plugin);
         }
         
         /***** Methods *****/

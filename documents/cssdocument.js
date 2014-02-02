@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "Plugin", "remote", "watcher"
+        "Plugin", "remote", "watcher", "fs"
     ];
     main.provides = ["CSSDocument"];
     return main;
@@ -9,6 +9,7 @@ define(function(require, exports, module) {
         var Plugin   = imports.Plugin;
         var remote   = imports.remote;
         var watcher  = imports.watcher;
+        var fs       = imports.fs;
         
         var counter = 0;
         
@@ -48,9 +49,16 @@ define(function(require, exports, module) {
             }
             
             function initTab(t){
-                if (tab) throw new Error("Tab has already been defined");
+                if (t && tab) 
+                    throw new Error("Tab has already been defined");
                 tab = t;
-                if (!tab) return;
+                
+                if (!tab) {
+                    fs.readFile(path, function(err, data){
+                        update(null, data);
+                    });
+                    return;
+                }
                 
                 doc = tab.document;
                 
@@ -70,9 +78,9 @@ define(function(require, exports, module) {
                 });
             }
             
-            function update(){
+            function update(changes, value){
                 transports.forEach(function(transport){
-                    transport.updateStyleSheet(path, doc.value);
+                    transport.updateStyleSheet(path, value || doc.value);
                 });
             }
             
