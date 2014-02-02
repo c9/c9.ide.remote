@@ -79,6 +79,17 @@ define(function(require, exports, module) {
                     update();
             }
             
+            
+            function setInstrumentationEnabled(enabled) {
+                if (enabled && !this._instrumentationEnabled) {
+                    var session = doc.getSession().session;
+                    HTMLInstrumentation.scanDocument(session);
+                    HTMLInstrumentation._markText(session);
+                }
+                
+                this._instrumentationEnabled = enabled;
+            }
+            
              /** Triggered on change by the editor */
             function update(changes, value){
                 // Calculate changes
@@ -88,16 +99,19 @@ define(function(require, exports, module) {
                 // TODO: text changes should be easy to add
                 // TODO: if new tags are added, need to instrument them
                 var session = doc.getSession().session;
+                if (!session.dom)
+                    setInstrumentationEnabled(true);
+                
                 var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
                 if (result.edits) {
                     transports.forEach(function(transport){
-                        transport.processDOMChanges(path, result.edits);
+                        transport.processDOMChanges(result.edits, path);
                     });
                 }
         
                 this.errors = result.errors || [];
-                if (this.errors.length) alert(this.errors); // @todo
+                if (this.errors.length) console.log(this.errors); // @todo
                 // $(this).triggerHandler("statusChanged", [this]);
                 
                 // Debug-only: compare in-memory vs. in-browser DOM
