@@ -151,8 +151,8 @@ define(function(require, exports, module) {
             }
             
             var lastQuery;
-            function highlightCSSQuery(query){
-                if (lastQuery == query) return;
+            function highlightCSSQuery(query, force){
+                if (!force && lastQuery == query) return;
                 lastQuery = query;
                 
                 var message = {

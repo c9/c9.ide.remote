@@ -43,9 +43,9 @@ define(function(require, exports, module) {
                         var idx = transports.indexOf(transport);
                         if (~idx) transports.splice(idx, 1);
                     });
-                    
-                    updateHighlight();
                 }
+                
+                updateHighlight(true);
                 
                 return plugin;
             }
@@ -122,7 +122,7 @@ define(function(require, exports, module) {
                 
                 // Send the highlight command
                 transports.forEach(function(transport){
-                    transport.highlightCSSQuery(query);
+                    transport.highlightCSSQuery(query, e === true);
                 });
             }
             
