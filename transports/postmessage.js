@@ -103,12 +103,12 @@ define(function(require, exports, module) {
                 
             }
             
-            function updateStyleSheet(url, value){
+            function updateStyleSheet(path, value){
                 var message = {
                     id      : sessionId,
-                    type    : "update",
-                    url     : url,
-                    css     : value
+                    type    : "updatecss",
+                    path    : path,
+                    data    : value
                 };
                 source.postMessage(message, "*");
             }

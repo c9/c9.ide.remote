@@ -52,16 +52,18 @@ define(function(require, exports, module) {
             }
             
             function initTab(t){
-                tab = t;
-                
-                if (!tab) {
+                if (!t) {
                     doc = null;
-                    fs.readFile(path, function(err, data){
-                        update(null, data);
-                    });
+                    if (tab) {
+                        fs.readFile(path, function(err, data){
+                            update(null, data);
+                        });
+                    }
+                    tab = null;
                     return;
                 }
                 
+                tab = t;
                 doc = tab.document;
                 
                 // Listen for change in the document
