@@ -116,6 +116,15 @@ define(function(require, exports, module) {
                 send(message);
             }
             
+            function initHTMLDocument(dom){
+                var message = {
+                    id      : sessionId,
+                    type    : "initdom",
+                    dom     : dom
+                };
+                send(message);
+            }
+            
             function getScript(){
                 
             }
@@ -222,6 +231,11 @@ define(function(require, exports, module) {
                  * 
                  */
                 getHTMLDocument: getHTMLDocument,
+                
+                /**
+                 * 
+                 */
+                initHTMLDocument: initHTMLDocument,
                 
                 /**
                  * 

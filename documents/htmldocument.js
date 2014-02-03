@@ -51,6 +51,8 @@ define(function(require, exports, module) {
                                 plugin.unload();
                         }
                     });
+                    
+                    initDom(transport, doc);
                 }
                 
                 // if (doc && doc.changed)
@@ -87,23 +89,22 @@ define(function(require, exports, module) {
                     update();
             }
             
-            function setInstrumentationEnabled(enabled) {
-                if (enabled && !this._instrumentationEnabled) {
-                    var session = doc.getSession().session;
-                    HTMLInstrumentation.scanDocument(session);
-                    HTMLInstrumentation._markText(session);
-                }
-                
-                this._instrumentationEnabled = enabled;
+            function initDom(transport) {
+                if (!doc) return;
+                var session = doc.getSession().session;
+                var dom = HTMLInstrumentation.scanDocument(session);
+                transport.initHTMLDocument(dom);
             }
             
             function update(changes, value){
+                if (!transports.length) return;
+                
                 if (!changes) return; //@todo allow only value to be set
                 
                 // Calculate changes
                 var session = doc.getSession().session;
                 if (!session.dom)
-                    setInstrumentationEnabled(true);
+                    return;
                 
                 var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
@@ -129,21 +130,21 @@ define(function(require, exports, module) {
                 //     });
                 // }
                 
-        //        var marker = HTMLInstrumentation._getMarkerAtDocumentPos(
-        //            this.editor,
-        //            editor.getCursorPos()
-        //        );
-        //
-        //        if (marker && marker.tagID) {
-        //            var range   = marker.find(),
-        //                text    = marker.doc.getRange(range.from, range.to);
-        //
-        //            // HACK maintain ID
-        //            text = text.replace(">", " data-brackets-id='" + marker.tagID + "'>");
-        //
-        //            // FIXME incorrectly replaces body elements with content only, missing body element
-        //            RemoteAgent.remoteElement(marker.tagID).replaceWith(text);
-        //        }
+                // var marker = HTMLInstrumentation._getMarkerAtDocumentPos(
+                //     this.editor,
+                //     editor.getCursorPos()
+                // );
+        
+                // if (marker && marker.tagID) {
+                //     var range   = marker.find(),
+                //         text    = marker.doc.getRange(range.from, range.to);
+        
+                //     // HACK maintain ID
+                //     text = text.replace(">", " data-brackets-id='" + marker.tagID + "'>");
+        
+                //     // FIXME incorrectly replaces body elements with content only, missing body element
+                //     RemoteAgent.remoteElement(marker.tagID).replaceWith(text);
+                // }
         
                 // if (!this.editor) {
                 //     return;
