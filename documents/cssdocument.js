@@ -88,6 +88,10 @@ define(function(require, exports, module) {
                 var lines   = session.doc.$lines;
                 var cursor  = session.selection.lead;
                 
+                if (!lines[cursor.row]) {
+                    return; //@todo
+                }
+                
                 var line = lines[cursor.row].substr(0, cursor.column);
                 
                 var query;
@@ -144,7 +148,7 @@ define(function(require, exports, module) {
                 // }
                 
                 var range = changes && changes.range;
-                if (changes && changes.text && range.start.row == range.end.row 
+                if (changes && lastQuery && changes.text && range.start.row == range.end.row 
                   && (changes.text != "insertText" || changes.text.indexOf(";") == -1)) {
                     var session = doc.getSession().session;
                     var line    = session.doc.$lines[range.end.row];
@@ -172,18 +176,19 @@ define(function(require, exports, module) {
                         var parts = section.split(":");
                         var key   = parts[0].trim();
                         var css   = (parts[1] || "").trim();
+                        if (key) {
+                            var rule = {
+                                selector : lastQuery,
+                                key      : key,
+                                value    : css
+                            };
+                            
+                            transports.forEach(function(transport){
+                                transport.updateStyleRule(path, rule);
+                            });
                         
-                        var rule = {
-                            selector : lastQuery,
-                            key      : key,
-                            value    : css
-                        };
-                        
-                        transports.forEach(function(transport){
-                            transport.updateStyleRule(path, rule);
-                        });
-                        
-                        return;
+                            return;
+                        }
                     }
                 }
                 
