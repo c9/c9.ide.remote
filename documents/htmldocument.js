@@ -77,21 +77,75 @@ define(function(require, exports, module) {
                     update();
             }
             
+            function setInstrumentationEnabled(enabled) {
+                if (enabled && !this._instrumentationEnabled) {
+                    var session = doc.getSession().session;
+                    HTMLInstrumentation.scanDocument(session);
+                    HTMLInstrumentation._markText(session);
+                }
+                
+                this._instrumentationEnabled = enabled;
+            }
+            
             function update(changes, value){
                 if (!changes) return; //@todo allow only value to be set
                 
                 // Calculate changes
                 var session = doc.getSession().session;
+                if (!session.dom)
+                    setInstrumentationEnabled(true);
+                
                 var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
                 if (result.edits) {
                     transports.forEach(function(transport){
-                        transport.processDOMChanges(path, result.edits);
+                        transport.processDOMChanges(result.edits, path);
                     });
                 }
         
                 this.errors = result.errors || [];
-                if (this.errors.length) alert(this.errors); // @todo
+                
+                if (this.errors.length) console.log(this.errors); // @todo
+                // $(this).triggerHandler("statusChanged", [this]);
+                
+                // Debug-only: compare in-memory vs. in-browser DOM
+                // edit this file or set a conditional breakpoint at the top of this function:
+                //     "this._debug = true, false"
+                // if (this._debug) {
+                //     console.log("Edits applied to browser were:");
+                //     console.log(JSON.stringify(result.edits, null, 2));
+                //     applyEditsPromise.done(function () {
+                //         self._compareWithBrowser(change);
+                //     });
+                // }
+                
+        //        var marker = HTMLInstrumentation._getMarkerAtDocumentPos(
+        //            this.editor,
+        //            editor.getCursorPos()
+        //        );
+        //
+        //        if (marker && marker.tagID) {
+        //            var range   = marker.find(),
+        //                text    = marker.doc.getRange(range.from, range.to);
+        //
+        //            // HACK maintain ID
+        //            text = text.replace(">", " data-brackets-id='" + marker.tagID + "'>");
+        //
+        //            // FIXME incorrectly replaces body elements with content only, missing body element
+        //            RemoteAgent.remoteElement(marker.tagID).replaceWith(text);
+        //        }
+        
+                // if (!this.editor) {
+                //     return;
+                // }
+                // var codeMirror = this.editor._codeMirror;
+                // while (change) {
+                //     var from = codeMirror.indexFromPos(change.from);
+                //     var to = codeMirror.indexFromPos(change.to);
+                //     var text = change.text.join("\n");
+                //     DOMAgent.applyChange(from, to, text);
+                //     change = change.next;
+                // }
             }
             
             /***** Lifecycle *****/
