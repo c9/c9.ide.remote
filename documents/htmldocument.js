@@ -53,6 +53,9 @@ define(function(require, exports, module) {
                     });
                 }
                 
+                // if (doc && doc.changed)
+                //     update();
+                
                 return plugin;
             }
             
