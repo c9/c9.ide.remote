@@ -171,7 +171,6 @@ define(function(require, exports, module) {
             // }
             
             function update(changes, value){
-                if (!transports.length) return;
                 // single line
                 // {
                 // action: "insertText" | "removeText"

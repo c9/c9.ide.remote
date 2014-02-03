@@ -80,7 +80,11 @@ define(function(require, exports, module) {
                 var c9session = doc.getSession();
                 c9session.on("init", function(e){
                     e.session.on("change", function(e){ update(e.data); });
+                    e.session.selection.on("changeCursor", updateHighlight);
                 });
+                
+                tab.on("activate", function(){ updateHighlight(); }, plugin);
+                tab.on("deactivate", function(){ updateHighlight(false); }, plugin);
                 
                 // Listen for a tab close event
                 tab.on("close", function(){ watcher.watch(path); });
@@ -96,9 +100,30 @@ define(function(require, exports, module) {
                 transport.initHTMLDocument(dom);
             }
             
-            function update(changes, value){
-                if (!transports.length) return;
+            function updateHighlight(e){
+                var query, tagId;
                 
+                if (tab && e !== false) {
+                    var session = doc.getSession().session;
+                    if (!session || !session.dom) return;
+                    
+                    tagId = HTMLInstrumentation._getTagIDAtDocumentPos(session, session.selection.lead);
+                }
+                
+                if (tagId) {
+                    query = "[data-brackets-id='"+tagId+"']"
+                } else {
+                    query = false;
+                }
+                
+                
+                // Send the highlight command
+                transports.forEach(function(transport){
+                    transport.highlightCSSQuery(query, e === true);
+                });
+            }
+            
+            function update(changes, value){
                 if (!changes) return; //@todo allow only value to be set
                 
                 // Calculate changes
