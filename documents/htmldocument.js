@@ -44,7 +44,12 @@ define(function(require, exports, module) {
                     
                     transport.addOther(function(){
                         var idx = transports.indexOf(transport);
-                        if (~idx) transports.splice(idx, 1);
+                        if (~idx) {
+                            transports.splice(idx, 1);
+                            
+                            if (transports.length === 0)
+                                plugin.unload();
+                        }
                     });
                 }
                 
