@@ -53,7 +53,8 @@ define(function(require, exports, module) {
                     });
                 }
                 
-                updateHighlight(true);
+                if (tab && tab.isActive())
+                    updateHighlight(true);
                 
                 if (doc && doc.changed)
                     update();
