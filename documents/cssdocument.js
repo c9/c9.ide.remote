@@ -50,7 +50,7 @@ define(function(require, exports, module) {
                 
                 updateHighlight(true);
                 
-                if (doc.changed)
+                if (doc && doc.changed)
                     update();
                 
                 return plugin;
@@ -114,7 +114,7 @@ define(function(require, exports, module) {
                     if (!started || query) {
                         for (var i = cursor.row - 1; i >= 0; i--) {
                             if (started) {
-                                if (lines[i].indexOf("}") > -1)
+                                if (lines[i].match(/[\}\;]/))
                                     break;
                                 else
                                     query = lines[i] + " " + query;
