@@ -42,8 +42,11 @@ define(function(require, exports, module) {
                         commands.exec(e.data.command);
                     }
                     else if (e.data.message == "callback") {
-                        callbacks[e.data.cb](e.data.data);
-                        delete callbacks[e.data.cb];
+                        var cb = callbacks[e.data.cb];
+                        if (cb) {
+                            cb(e.data.data);
+                            delete callbacks[e.data.cb];
+                        }
                     }
                     else if (e.data.message == "focus") {
                         emit("focus");
