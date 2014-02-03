@@ -13,6 +13,9 @@ define(function(require, exports, module) {
         
         var counter = 0;
         
+        var style = document.createElement("style");
+        document.documentElement.appendChild(style);
+        
         function CSSDocument(path){
             var exists = remote.findDocument(path);
             if (exists) return exists;
@@ -47,6 +50,9 @@ define(function(require, exports, module) {
                 
                 updateHighlight(true);
                 
+                if (doc.changed)
+                    update();
+                
                 return plugin;
             }
             
@@ -79,9 +85,6 @@ define(function(require, exports, module) {
                 
                 // Listen for a tab close event
                 tab.on("close", function(){ watcher.watch(path); }, plugin);
-                
-                if (doc.changed)
-                    update();
             }
             
             var lastQuery;
@@ -102,19 +105,35 @@ define(function(require, exports, module) {
                     
                     var line = lines[cursor.row].substr(0, cursor.column);
                     
-                    if (line.match(reCssQuery))
+                    var started = false;
+                    if (line.match(reCssQuery)) {
                         query = RegExp.$2;
-                    else {
+                        started = true;
+                    }
+                    
+                    if (!started || query) {
                         for (var i = cursor.row - 1; i >= 0; i--) {
-                            if (lines[i].match(reCssQuery)) {
+                            if (started) {
+                                if (lines[i].indexOf("}") > -1)
+                                    break;
+                                else
+                                    query = lines[i] + " " + query;
+                            }
+                            else if (lines[i].match(reCssQuery)) {
                                 query = RegExp.$2;
-                                break;
+                                if (!query) break;
+                                started = true;
                             }
                         }
                     }
                 }
                 else {
                     query = false;
+                }
+                
+                if (query) {
+                    style.textContent = query + "{}";
+                    query = style.sheet.rules[0].selectorText;
                 }
                 
                 // Remember the last query

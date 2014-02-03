@@ -23,7 +23,8 @@ define(function(require, exports, module) {
             var plugin = new Plugin("Ajax.org", main.consumes);
             var emit   = plugin.getEmitter();
             
-            var styleSheets, scripts, html, source;
+            var sources = [];
+            var styleSheets, scripts, html;
             
             var loaded = false;
             function load() {
@@ -52,10 +53,17 @@ define(function(require, exports, module) {
                         styleSheets = data.styles;
                         scripts     = data.scripts;
                         html        = data.href;
-                        source      = e.source;
+                        
+                        if (sources.indexOf(e.source) == -1) {
+                            sources.push(e.source);
+                            e.source.addEventListener("close", function(){
+                                var idx = sources.indexOf(this);
+                                if (idx > -1) sources.splice(idx, 1);
+                            });
+                        }
                         
                         // Send available keys
-                        source.postMessage({
+                        e.source.postMessage({
                             id   : sessionId,
                             type : "keys",
                             keys : commands.getExceptionBindings()
@@ -86,6 +94,12 @@ define(function(require, exports, module) {
                 });
             }
             
+            function send(message){
+                sources.forEach(function(source){
+                    source.postMessage(message, "*");
+                });
+            }
+            
             function getStyleSheet(){
                 
             }
@@ -96,7 +110,7 @@ define(function(require, exports, module) {
                     type    : "simpledom",
                     cb      : wrapCallback(callback)
                 };
-                source.postMessage(message, "*");
+                send(message);
             }
             
             function getScript(){
@@ -110,7 +124,7 @@ define(function(require, exports, module) {
                     path    : path,
                     data    : value
                 };
-                source.postMessage(message, "*");
+                send(message);
             }
             
             function updateStyleRule(url, rule){
@@ -120,7 +134,7 @@ define(function(require, exports, module) {
                     url     : url,
                     rule    : rule
                 };
-                source.postMessage(message, "*");
+                send(message);
             }
             
             function processDOMChanges(edits){
@@ -129,7 +143,7 @@ define(function(require, exports, module) {
                     type    : "domedits",
                     edits   : edits
                 };
-                source.postMessage(message, "*");
+                send(message);
             }
             
             function updateScript(){
@@ -143,7 +157,7 @@ define(function(require, exports, module) {
                     url     : url,
                     del     : true
                 };
-                source.postMessage(message, "*");
+                send(message);
             }
             
             function deleteScript(){
@@ -160,7 +174,7 @@ define(function(require, exports, module) {
                     type    : "highlight",
                     query   : query
                 };
-                source.postMessage(message, "*");
+                send(message);
             }
             
             /***** Lifecycle *****/
