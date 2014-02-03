@@ -49,8 +49,6 @@ define(function(require, exports, module) {
             }
             
             function initTab(t){
-                if (t && tab) 
-                    throw new Error("Tab has already been defined");
                 tab = t;
                 
                 if (!tab) {

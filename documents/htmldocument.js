@@ -52,8 +52,6 @@ define(function(require, exports, module) {
             }
             
             function initTab(t){
-                if (t && tab) 
-                    throw new Error("Tab has already been defined");
                 tab = t;
                 
                 if (!tab) {
@@ -79,14 +77,10 @@ define(function(require, exports, module) {
                     update();
             }
             
-             /** Triggered on change by the editor */
             function update(changes, value){
-                // Calculate changes
                 if (!changes) return; //@todo allow only value to be set
                 
-                // Only handles attribute changes currently.
-                // TODO: text changes should be easy to add
-                // TODO: if new tags are added, need to instrument them
+                // Calculate changes
                 var session = doc.getSession().session;
                 var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
@@ -98,46 +92,6 @@ define(function(require, exports, module) {
         
                 this.errors = result.errors || [];
                 if (this.errors.length) alert(this.errors); // @todo
-                // $(this).triggerHandler("statusChanged", [this]);
-                
-                // Debug-only: compare in-memory vs. in-browser DOM
-                // edit this file or set a conditional breakpoint at the top of this function:
-                //     "this._debug = true, false"
-                // if (this._debug) {
-                //     console.log("Edits applied to browser were:");
-                //     console.log(JSON.stringify(result.edits, null, 2));
-                //     applyEditsPromise.done(function () {
-                //         self._compareWithBrowser(change);
-                //     });
-                // }
-                
-        //        var marker = HTMLInstrumentation._getMarkerAtDocumentPos(
-        //            this.editor,
-        //            editor.getCursorPos()
-        //        );
-        //
-        //        if (marker && marker.tagID) {
-        //            var range   = marker.find(),
-        //                text    = marker.doc.getRange(range.from, range.to);
-        //
-        //            // HACK maintain ID
-        //            text = text.replace(">", " data-brackets-id='" + marker.tagID + "'>");
-        //
-        //            // FIXME incorrectly replaces body elements with content only, missing body element
-        //            RemoteAgent.remoteElement(marker.tagID).replaceWith(text);
-        //        }
-        
-                // if (!this.editor) {
-                //     return;
-                // }
-                // var codeMirror = this.editor._codeMirror;
-                // while (change) {
-                //     var from = codeMirror.indexFromPos(change.from);
-                //     var to = codeMirror.indexFromPos(change.to);
-                //     var text = change.text.join("\n");
-                //     DOMAgent.applyChange(from, to, text);
-                //     change = change.next;
-                // }
             }
             
             /***** Lifecycle *****/
