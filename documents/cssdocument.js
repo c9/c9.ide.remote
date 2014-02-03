@@ -198,7 +198,9 @@ define(function(require, exports, module) {
                                 section += char;
                             }
                         }
-                        for (var i = range.start.column - (changes.action == "insertText" ? 1 : 0); i >= 0; i--) {
+                        var start = range.start.column - 1 
+                            + (changes.action == "removeText" ? changes.text.length : 0);
+                        for (var i = start; i >= 0; i--) {
                             char = line.charAt(i);
                             if (char == ";") break;
                             section = char + section;
