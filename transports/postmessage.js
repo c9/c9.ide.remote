@@ -150,7 +150,11 @@ define(function(require, exports, module) {
                 
             }
             
+            var lastQuery;
             function highlightCSSQuery(query){
+                if (lastQuery == query) return;
+                lastQuery = query;
+                
                 var message = {
                     id      : sessionId,
                     type    : "highlight",

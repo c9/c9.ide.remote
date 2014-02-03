@@ -43,6 +43,8 @@ define(function(require, exports, module) {
                         var idx = transports.indexOf(transport);
                         if (~idx) transports.splice(idx, 1);
                     });
+                    
+                    updateHighlight();
                 }
                 
                 return plugin;
@@ -63,6 +65,9 @@ define(function(require, exports, module) {
                 tab = t;
                 doc = tab.document;
                 
+                tab.on("activate", function(){ updateHighlight(); }, plugin);
+                tab.on("deactivate", function(){ updateHighlight(false); }, plugin);
+                
                 var c9session = doc.getSession();
                 c9session.on("init", function(e){
                     // Listen for change in the document
@@ -73,7 +78,7 @@ define(function(require, exports, module) {
                 });
                 
                 // Listen for a tab close event
-                tab.on("close", function(){ watcher.watch(path); });
+                tab.on("close", function(){ watcher.watch(path); }, plugin);
                 
                 if (doc.changed)
                     update();
@@ -82,33 +87,40 @@ define(function(require, exports, module) {
             var lastQuery;
             var reCssQuery = /(^|.*\})(.*)\{|\}/;
             function updateHighlight(e){
-                if (!tab) return;
-                
-                var session = doc.getSession().session;
-                var lines   = session.doc.$lines;
-                var cursor  = session.selection.lead;
-                
-                if (!lines[cursor.row]) {
-                    return; //@todo
-                }
-                
-                var line = lines[cursor.row].substr(0, cursor.column);
-                
                 var query;
-                if (line.match(reCssQuery))
-                    query = RegExp.$2;
-                else {
-                    for (var i = cursor.row - 1; i >= 0; i--) {
-                        if (lines[i].match(reCssQuery)) {
-                            query = RegExp.$2;
-                            break;
+                
+                if (tab && e !== false) {
+                    var session = doc.getSession().session;
+                    if (!session) return;
+                    
+                    var lines   = session.doc.$lines;
+                    var cursor  = session.selection.lead;
+                    
+                    if (!lines[cursor.row]) {
+                        return; //@todo
+                    }
+                    
+                    var line = lines[cursor.row].substr(0, cursor.column);
+                    
+                    if (line.match(reCssQuery))
+                        query = RegExp.$2;
+                    else {
+                        for (var i = cursor.row - 1; i >= 0; i--) {
+                            if (lines[i].match(reCssQuery)) {
+                                query = RegExp.$2;
+                                break;
+                            }
                         }
                     }
                 }
+                else {
+                    query = false;
+                }
                 
-                if (lastQuery == query) return;
+                // Remember the last query
                 lastQuery = query;
                 
+                // Send the highlight command
                 transports.forEach(function(transport){
                     transport.highlightCSSQuery(query);
                 });
