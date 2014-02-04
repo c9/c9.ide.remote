@@ -53,7 +53,12 @@ define(function(require, exports, module) {
                     });
                     
                 }
-                initDom(transport, doc);
+                
+                if (doc)
+                    initDom(transport, doc);
+                
+                if (tab && tab.isActive())
+                    updateHighlight(true);
                 
                 // if (doc && doc.changed)
                 //     update();

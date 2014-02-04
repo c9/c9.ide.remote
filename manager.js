@@ -116,6 +116,8 @@ define(function(require, exports, module) {
          * 
          **/
         plugin.freezePublicAPI({
+            get documents(){ return documents; },
+            
             _events : [
                 /**
                  * @event draw
