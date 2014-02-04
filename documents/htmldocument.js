@@ -52,8 +52,8 @@ define(function(require, exports, module) {
                         }
                     });
                     
-                    initDom(transport, doc);
                 }
+                initDom(transport, doc);
                 
                 // if (doc && doc.changed)
                 //     update();
@@ -79,8 +79,19 @@ define(function(require, exports, module) {
                 // Listen for change in the document
                 var c9session = doc.getSession();
                 c9session.on("init", function(e){
-                    e.session.on("change", function(e){ update(e.data); });
+                    e.session.on("change", update);
                     e.session.selection.on("changeCursor", updateHighlight);
+                    e.session.savedDom = null;
+                    e.session.dom = null;
+                    plugin.addOther(function () {
+                        e.session.off("change", update );
+                        e.session.selection.off("changeCursor", updateHighlight);
+                        e.session.savedDom = null;
+                        e.session.dom = null;
+                    });
+                    transports.forEach(function(transport) {
+                        initDom(transport, doc);
+                    });
                 });
                 
                 tab.on("activate", function(){ updateHighlight(); }, plugin);
@@ -89,15 +100,16 @@ define(function(require, exports, module) {
                 // Listen for a tab close event
                 tab.on("close", function(){ watcher.watch(path); });
                 
-                if (doc.changed)
-                    update();
+                // if (doc.changed)
+                //     update();
             }
             
             function initDom(transport) {
                 if (!doc) return;
                 var session = doc.getSession().session;
-                var dom = HTMLInstrumentation.scanDocument(session);
-                transport.initHTMLDocument(dom);
+                if (!session) return;
+                var docState = HTMLInstrumentation.scanDocument(session);
+                transport.initHTMLDocument(docState);
             }
             
             function updateHighlight(e){
@@ -123,7 +135,8 @@ define(function(require, exports, module) {
                 });
             }
             
-            function update(changes, value){
+            function update(e, value){
+                var changes = e && e.data;
                 if (!changes) return; //@todo allow only value to be set
                 
                 // Calculate changes
