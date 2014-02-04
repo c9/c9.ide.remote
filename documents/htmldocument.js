@@ -133,7 +133,6 @@ define(function(require, exports, module) {
                     query = false;
                 }
                 
-                
                 // Send the highlight command
                 transports.forEach(function(transport){
                     transport.highlightCSSQuery(query, e === true);
