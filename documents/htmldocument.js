@@ -128,7 +128,7 @@ define(function(require, exports, module) {
                 }
                 
                 if (tagId) {
-                    query = "[data-brackets-id='"+tagId+"']"
+                    query = "[data-cloud9-id='"+tagId+"']"
                 } else {
                     query = false;
                 }
@@ -183,7 +183,7 @@ define(function(require, exports, module) {
                 //         text    = marker.doc.getRange(range.from, range.to);
         
                 //     // HACK maintain ID
-                //     text = text.replace(">", " data-brackets-id='" + marker.tagID + "'>");
+                //     text = text.replace(">", " data-cloud9-id='" + marker.tagID + "'>");
         
                 //     // FIXME incorrectly replaces body elements with content only, missing body element
                 //     RemoteAgent.remoteElement(marker.tagID).replaceWith(text);
