@@ -72,6 +72,8 @@ define(function(require, exports, module) {
                             keys : commands.getExceptionBindings()
                         }, "*");
                         
+                        // todo: should this emit e, so that init messages are 
+                        // sent only to newly added page?
                         emit("ready");
                     }
                 };
