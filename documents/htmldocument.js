@@ -55,7 +55,7 @@ define(function(require, exports, module) {
                 }
                 
                 if (doc)
-                    initDom(transport, doc);
+                    initDom(transport);
                 
                 if (tab && tab.isActive())
                     updateHighlight(true);
@@ -114,7 +114,13 @@ define(function(require, exports, module) {
                 var session = doc.getSession().session;
                 if (!session) return;
                 var docState = HTMLInstrumentation.scanDocument(session);
-                transport.initHTMLDocument(docState);
+                if (docState.errors) {
+                    session.dom = null;
+                    this.errors = docState.errors;
+                    console.log(this.errors);
+                } else {
+                    transport.initHTMLDocument(docState);
+                }
             }
             
             function updateHighlight(e){
@@ -145,8 +151,12 @@ define(function(require, exports, module) {
                 
                 // Calculate changes
                 var session = doc.getSession().session;
-                if (!session.dom)
+                if (!session.dom) {
+                    transports.forEach(function(transport) {
+                        initDom(transport);
+                    });
                     return;
+                }
                 
                 var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
