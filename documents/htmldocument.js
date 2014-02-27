@@ -11,6 +11,7 @@ define(function(require, exports, module) {
         var watcher  = imports.watcher;
         var fs       = imports.fs;
         
+        var Range    = require("ace/range").Range;
         var HTMLInstrumentation 
             = require("../../c9.ide.language.html.diff/HTMLInstrumentation");
         
@@ -89,7 +90,7 @@ define(function(require, exports, module) {
                     e.session.savedDom = null;
                     e.session.dom = null;
                     plugin.addOther(function () {
-                        e.session.off("change", update );
+                        e.session.off("change", update);
                         e.session.selection.off("changeCursor", updateHighlight);
                         e.session.savedDom = null;
                         e.session.dom = null;
@@ -113,7 +114,7 @@ define(function(require, exports, module) {
                 if (!doc) return;
                 var session = doc.getSession().session;
                 if (!session) return;
-                var docState = HTMLInstrumentation.scanDocument(session);
+                var docState = HTMLInstrumentation.syncTagIds(session);
                 if (docState.errors) {
                     session.dom = null;
                     this.errors = docState.errors;
@@ -134,7 +135,7 @@ define(function(require, exports, module) {
                 }
                 
                 if (tagId) {
-                    query = "[data-cloud9-id='"+tagId+"']"
+                    query = "[data-cloud9-id='" + tagId + "']";
                 } else {
                     query = false;
                 }
@@ -168,47 +169,14 @@ define(function(require, exports, module) {
         
                 this.errors = result.errors || [];
                 
-                if (this.errors.length) console.log(this.errors); // @todo
-                // $(this).triggerHandler("statusChanged", [this]);
-                
-                // Debug-only: compare in-memory vs. in-browser DOM
-                // edit this file or set a conditional breakpoint at the top of this function:
-                //     "this._debug = true, false"
-                // if (this._debug) {
-                //     console.log("Edits applied to browser were:");
-                //     console.log(JSON.stringify(result.edits, null, 2));
-                //     applyEditsPromise.done(function () {
-                //         self._compareWithBrowser(change);
-                //     });
-                // }
-                
-                // var marker = HTMLInstrumentation._getMarkerAtDocumentPos(
-                //     this.editor,
-                //     editor.getCursorPos()
-                // );
-        
-                // if (marker && marker.tagID) {
-                //     var range   = marker.find(),
-                //         text    = marker.doc.getRange(range.from, range.to);
-        
-                //     // HACK maintain ID
-                //     text = text.replace(">", " data-cloud9-id='" + marker.tagID + "'>");
-        
-                //     // FIXME incorrectly replaces body elements with content only, missing body element
-                //     RemoteAgent.remoteElement(marker.tagID).replaceWith(text);
-                // }
-        
-                // if (!this.editor) {
-                //     return;
-                // }
-                // var codeMirror = this.editor._codeMirror;
-                // while (change) {
-                //     var from = codeMirror.indexFromPos(change.from);
-                //     var to = codeMirror.indexFromPos(change.to);
-                //     var text = change.text.join("\n");
-                //     DOMAgent.applyChange(from, to, text);
-                //     change = change.next;
-                // }
+                if (this.errors.length) {
+                    var error = this.errors[0];
+                    var range = Range.fromPoints(error.startPos, error.endPos);
+                    session.domErrorMarker = session.addMarker(range, "language_highlight_error", "text");
+                } else if (session.domErrorMarker) {
+                    session.removeMarker(session.domErrorMarker);
+                    session.domErrorMarker = null;
+                }
             }
             
             /***** Lifecycle *****/
