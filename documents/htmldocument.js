@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "Plugin", "remote", "watcher", "fs"
+        "Plugin", "remote", "watcher", "fs", "save"
     ];
     main.provides = ["HTMLDocument"];
     return main;
@@ -9,6 +9,7 @@ define(function(require, exports, module) {
         var Plugin   = imports.Plugin;
         var remote   = imports.remote;
         var watcher  = imports.watcher;
+        var save     = imports.save;
         var fs       = imports.fs;
         
         var Range    = require("ace/range").Range;
@@ -106,8 +107,14 @@ define(function(require, exports, module) {
                 // Listen for a tab close event
                 tab.on("close", function(){ watcher.watch(path); });
                 
-                // if (doc.changed)
-                //     update();
+                // @Ruben is there a better way to listen for save event?
+                save.on("afterSave", function(e){
+                    if (e.document == doc) {
+                        var session = doc.getSession().session;
+                        if (session)
+                            session.savedDom = session.dom;
+                    }
+                });
             }
             
             function initDom(transport) {
@@ -169,13 +176,14 @@ define(function(require, exports, module) {
         
                 this.errors = result.errors || [];
                 
+                if (session.domErrorMarker) {
+                    session.removeMarker(session.domErrorMarker);
+                    session.domErrorMarker = null;
+                }
                 if (this.errors.length) {
                     var error = this.errors[0];
                     var range = Range.fromPoints(error.startPos, error.endPos);
                     session.domErrorMarker = session.addMarker(range, "language_highlight_error", "text");
-                } else if (session.domErrorMarker) {
-                    session.removeMarker(session.domErrorMarker);
-                    session.domErrorMarker = null;
                 }
             }
             
