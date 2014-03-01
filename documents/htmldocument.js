@@ -138,7 +138,14 @@ define(function(require, exports, module) {
                     var session = doc.getSession().session;
                     if (!session || !session.dom) return;
                     
-                    tagId = HTMLInstrumentation._getTagIDAtDocumentPos(session, session.selection.lead);
+                    var pos = {
+                        row: session.selection.lead.row,
+                        column: session.selection.lead.column
+                    };
+                    if (session.doc.getLine(pos.row)[pos.column] === "<")
+                        pos.column++; // prefer element after cursor
+                    
+                    tagId = HTMLInstrumentation._getTagIDAtDocumentPos(session, pos);
                 }
                 
                 if (tagId) {
