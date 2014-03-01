@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "Plugin", "remote", "watcher", "fs", "save"
+        "Plugin", "remote", "watcher", "fs", "save", "dialog.error"
     ];
     main.provides = ["HTMLDocument"];
     return main;
@@ -11,8 +11,9 @@ define(function(require, exports, module) {
         var watcher  = imports.watcher;
         var save     = imports.save;
         var fs       = imports.fs;
-        
         var Range    = require("ace/range").Range;
+        
+        var errorDialog = imports["dialog.error"];
         var HTMLInstrumentation 
             = require("../../c9.ide.language.html.diff/HTMLInstrumentation");
         
@@ -28,7 +29,7 @@ define(function(require, exports, module) {
             // var emit   = plugin.getEmitter();
             
             var transports = [];
-            var tab, doc;
+            var tab, doc, errors = {};
             
             var loaded = false;
             function load() {
@@ -111,10 +112,18 @@ define(function(require, exports, module) {
                 save.on("afterSave", function(e){
                     if (e.document == doc) {
                         var session = doc.getSession().session;
-                        if (session)
+                        if (session) {
+                            if (!session.dom && !session.savedDom && errors.save) {
+                                errors.save = false;
+                                transports.forEach(function(transport) {
+                                    transport.reload();
+                                });
+                                errorDialog.hide();
+                            }
                             session.savedDom = session.dom;
+                        }
                     }
-                });
+                }, plugin);
             }
             
             function initDom(transport) {
@@ -122,6 +131,10 @@ define(function(require, exports, module) {
                 var session = doc.getSession().session;
                 if (!session) return;
                 var docState = HTMLInstrumentation.syncTagIds(session);
+                if (!session.dom && docState.errors) {
+                    errors.save = true;
+                    errorDialog.show("Unable to start live editing session, try saving the document");
+                }
                 if (docState.errors) {
                     session.dom = null;
                     this.errors = docState.errors;
@@ -175,23 +188,49 @@ define(function(require, exports, module) {
                 
                 var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
+                if (!result.edits && result.errors && result.errors.length) {
+                    scheduleDisplayError("Unable to update preview: unmatched tags detected");
+                } else {
+                    scheduleDisplayError(false);
+                }
+                
                 if (result.edits) {
                     transports.forEach(function(transport){
                         transport.processDOMChanges(result.edits, path);
                     });
                 }
         
-                this.errors = result.errors || [];
+                errors.unmatchedTags = result.errors;
                 
                 if (session.domErrorMarker) {
                     session.removeMarker(session.domErrorMarker);
                     session.domErrorMarker = null;
                 }
-                if (this.errors.length) {
-                    var error = this.errors[0];
+                if (errors.unmatchedTags && errors.unmatchedTags.length) {
+                    var error = errors.unmatchedTags[0];
                     var range = Range.fromPoints(error.startPos, error.endPos);
+                    if (range.isEmpty()) {
+                        range.start.column--;
+                        range.end.column++;
+                    }
                     session.domErrorMarker = session.addMarker(range, "language_highlight_error", "text");
                 }
+            }
+            
+            function scheduleDisplayError(msg) {
+                clearTimeout(errors.timer);
+                if (!msg && !errors.msg) return;
+                errors.timer = setTimeout(function() {
+                    errors.msg = msg;
+                    if (!msg) {
+                        errorDialog.hide();
+                    } else {
+                        errorDialog.show(msg);
+                    }
+                    errors.timer = setTimeout(function() {
+                        errorDialog.hide();
+                    }, 2000);
+                }, 800);
             }
             
             /***** Lifecycle *****/

@@ -178,6 +178,14 @@ define(function(require, exports, module) {
                 
             }
             
+            function reload(){
+                var message = {
+                    id      : sessionId,
+                    type    : "reload"
+                };
+                send(message);
+            }
+            
             var lastQuery;
             function highlightCSSQuery(query, force){
                 if (!force && lastQuery == query) return;
@@ -218,6 +226,11 @@ define(function(require, exports, module) {
                      */
                     "draw"
                 ],
+                
+                /**
+                 * 
+                 */
+                reload: reload,
                 
                 /**
                  * 
