@@ -133,7 +133,8 @@ define(function(require, exports, module) {
                 var docState = HTMLInstrumentation.syncTagIds(session);
                 if (!session.dom && docState.errors) {
                     errors.save = true;
-                    errorDialog.show("Unable to start live editing session, try saving the document");
+                    var name = doc.tab.path && doc.tab.path.match(/(^|\/)([^\/]*)$/)[2] || "the document";
+                    errorDialog.show("Please save " + name + " to start a new live editing session");
                 }
                 if (docState.errors) {
                     session.dom = null;
