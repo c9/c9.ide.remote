@@ -195,7 +195,7 @@ define(function(require, exports, module) {
                     scheduleDisplayError(false);
                 }
                 
-                if (result.edits) {
+                if (result.edits && result.edits.length) {
                     transports.forEach(function(transport){
                         transport.processDOMChanges(result.edits, path);
                     });
