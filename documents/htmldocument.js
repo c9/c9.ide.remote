@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "Plugin", "remote", "watcher", "fs", "save", "dialog.error"
+        "Plugin", "remote", "watcher", "fs", "save", "dialog.error", "commands"
     ];
     main.provides = ["HTMLDocument"];
     return main;
@@ -11,6 +11,7 @@ define(function(require, exports, module) {
         var watcher  = imports.watcher;
         var save     = imports.save;
         var fs       = imports.fs;
+        var commands = imports.commands;
         var Range    = require("ace/range").Range;
         
         var errorDialog = imports["dialog.error"];
@@ -35,6 +36,21 @@ define(function(require, exports, module) {
             function load() {
                 if (loaded) return false;
                 loaded = true;
+                
+                // todo what is proper place for this?
+                commands.addCommand({
+                    name: "scrollPreviewElementIntoView",
+                    displayName: "Preview:scroll element into view",
+                    bindKey: {win: "Ctrl-I", mac: "Ctrl-I"},
+                    exec: function(editor) {
+                        editor.ace.session.htmldocument.scrollIntoView();
+                    },
+                    isAvailable: function(editor) {
+                        if (editor && editor.ace && editor.ace.session.htmldocument) {
+                            return true;
+                        }
+                    }
+                }, plugin);
                 
                 remote.register(plugin);
             }
@@ -86,16 +102,18 @@ define(function(require, exports, module) {
                 
                 // Listen for change in the document
                 var c9session = doc.getSession();
-                c9session.on("init", function(e){
+                c9session.on("init", function(e) {
                     e.session.on("change", update);
                     e.session.selection.on("changeCursor", updateHighlight);
                     e.session.savedDom = null;
                     e.session.dom = null;
+                    e.session.htmldocument = plugin;
                     plugin.addOther(function () {
                         e.session.off("change", update);
                         e.session.selection.off("changeCursor", updateHighlight);
                         e.session.savedDom = null;
                         e.session.dom = null;
+                        e.session.htmldocument = null;
                     });
                     transports.forEach(function(transport) {
                         initDom(transport, doc);
@@ -234,6 +252,13 @@ define(function(require, exports, module) {
                 }, 800);
             }
             
+            function scrollIntoView() {
+                updateHighlight();
+                transports.forEach(function(transport){
+                    transport.reveal();
+                });
+            }
+            
             /***** Lifecycle *****/
             
             plugin.on("load", function() {
@@ -285,7 +310,12 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
-                update: update
+                update: update,
+                
+                /**
+                 * 
+                 */
+                scrollIntoView: scrollIntoView
             });
             
             plugin.load("htmldocument" + counter++);

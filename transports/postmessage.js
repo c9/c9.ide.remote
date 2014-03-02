@@ -199,6 +199,15 @@ define(function(require, exports, module) {
                 send(message);
             }
             
+            function reveal(query) {
+                var message = {
+                    id      : sessionId,
+                    type    : "reveal",
+                    query   : query || lastQuery
+                };
+                send(message);
+            }
+            
             /***** Lifecycle *****/
             
             plugin.on("load", function() {
@@ -290,10 +299,15 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
-                highlightCSSQuery: highlightCSSQuery
+                highlightCSSQuery: highlightCSSQuery,
+                
+                /**
+                 * 
+                 */
+                reveal: reveal
             });
             
-            plugin.load("postmessage" + counter++)
+            plugin.load("postmessage" + counter++);
             
             return plugin;
         }
