@@ -150,9 +150,12 @@ define(function(require, exports, module) {
                 if (!session) return;
                 var docState = HTMLInstrumentation.syncTagIds(session);
                 if (!session.dom && docState.errors) {
-                    errors.save = true;
-                    var name = doc.tab.path && doc.tab.path.match(/(^|\/)([^\/]*)$/)[2] || "the document";
-                    errorDialog.show("Please save " + name + " to start a new live editing session");
+                    var editList = HTMLInstrumentation.getUnappliedEditList(session);
+                    if (!reportErrors(session, editList)) {
+                        errors.save = true;
+                        var name = doc.tab.path && doc.tab.path.match(/(^|\/)([^\/]*)$/)[2] || "the document";
+                        errorDialog.show("Please save " + name + " to start a new live editing session");
+                    }
                 }
                 if (docState.errors) {
                     session.dom = null;
@@ -207,19 +210,23 @@ define(function(require, exports, module) {
                 
                 var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
-                if (!result.edits && result.errors && result.errors.length) {
-                    scheduleDisplayError("Unable to update preview: unmatched tags detected");
-                } else {
-                    scheduleDisplayError(false);
-                }
-                
                 if (result.edits && result.edits.length) {
                     transports.forEach(function(transport){
                         transport.processDOMChanges(result.edits, path);
                     });
                 }
+                
+                reportErrors(session, result);
+            }
+            
+            function reportErrors(session, editList) {
+                if (!editList.edits && editList.errors && editList.errors.length) {
+                    scheduleDisplayError("Unable to update preview: unmatched tags detected");
+                } else {
+                    scheduleDisplayError(false);
+                }
         
-                errors.unmatchedTags = result.errors;
+                errors.unmatchedTags = editList.errors;
                 
                 if (session.domErrorMarker) {
                     session.removeMarker(session.domErrorMarker);
@@ -234,6 +241,7 @@ define(function(require, exports, module) {
                     }
                     session.domErrorMarker = session.addMarker(range, "language_highlight_error", "text");
                 }
+                return editList.errors && editList.errors.length;
             }
             
             function scheduleDisplayError(msg) {
