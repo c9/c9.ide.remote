@@ -136,7 +136,6 @@ define(function(require, exports, module) {
                                 transports.forEach(function(transport) {
                                     transport.reload();
                                 });
-                                errorDialog.hide();
                             }
                             session.savedDom = session.dom;
                         }
@@ -249,14 +248,7 @@ define(function(require, exports, module) {
                 if (!msg && !errors.msg) return;
                 errors.timer = setTimeout(function() {
                     errors.msg = msg;
-                    if (!msg) {
-                        errorDialog.hide();
-                    } else {
-                        errorDialog.show(msg);
-                    }
-                    errors.timer = setTimeout(function() {
-                        errorDialog.hide();
-                    }, 2000);
+                    errorDialog.show(msg, 2000);
                 }, 800);
             }
             
