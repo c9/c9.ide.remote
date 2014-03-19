@@ -59,9 +59,12 @@ define(function(require, exports, module) {
                         
                         if (sources.indexOf(e.source) == -1) {
                             sources.push(e.source);
-                            e.source.addEventListener("close", function(){
+                            e.source.addEventListener("unload", function(){
                                 var idx = sources.indexOf(this);
                                 if (idx > -1) sources.splice(idx, 1);
+                                
+                                if (!sources.length)
+                                    emit("empty");
                             });
                         }
                         
@@ -229,6 +232,8 @@ define(function(require, exports, module) {
              * 
              **/
             plugin.freezePublicAPI({
+                get sources(){ return sources.slice(0); },
+                
                 _events : [
                     /**
                      * @event draw
