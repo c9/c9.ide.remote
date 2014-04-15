@@ -10,10 +10,7 @@ define(function(require, exports, module) {
         var commands = imports.commands;
         var c9       = imports.c9;
         
-        var HTMLURL = options.htmlurl
-        if (!HTMLURL || HTMLURL.charAt(0) == "/")
-            HTMLURL = location.protocol + "//" + location.host + HTMLURL;
-        var previewOrigin = HTMLURL.match(/^(?:[^\/]|\/\/)*/)[0];
+        var previewBaseUrl = options.previewBaseUrl;
         
         var counter = 0;
         
@@ -32,7 +29,7 @@ define(function(require, exports, module) {
                 loaded = true;
                 
                 var onMessage = function(e) {
-                    if (c9.hosted && event.origin !== previewOrigin)
+                    if (c9.hosted && event.origin !== previewBaseUrl)
                         return;
                     
                     if (sessionId != e.data.id)
