@@ -87,6 +87,7 @@ define(function(require, exports, module) {
             /***** Methods *****/
             
             function toPath(href) {
+                href = unescape(href);
                 return c9.hosted
                     ? href.replace(new RegExp("^/" + c9.workspaceId), "")
                     : href;
