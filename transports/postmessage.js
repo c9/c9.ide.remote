@@ -50,9 +50,9 @@ define(function(require, exports, module) {
                     }
                     else if (e.data.message == "html.ready") {
                         var data = e.data.data;
-                        styleSheets = data.styles;
-                        scripts     = data.scripts;
-                        html        = data.href;
+                        styleSheets = data.styles.map(toPath);
+                        scripts     = data.scripts.map(toPath);
+                        html        = toPath(data.href);
                         
                         if (sources.indexOf(e.source) == -1) {
                             sources.push(e.source);
@@ -85,6 +85,12 @@ define(function(require, exports, module) {
             }
             
             /***** Methods *****/
+            
+            function toPath(href) {
+                return c9.hosted
+                    ? href.replace(new RegExp("^/" + c9.workspaceId), "")
+                    : href;
+            }
             
             var callbacks = [];
             function wrapCallback(callback){
