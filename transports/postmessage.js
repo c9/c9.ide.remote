@@ -74,6 +74,13 @@ define(function(require, exports, module) {
                 plugin.addOther(function(){
                     window.removeEventListener("message", onMessage, false);
                 });
+                
+                setInterval(function gc() {
+                    if (getWindows().length)
+                        return;
+                    clearInterval(gc);
+                    emit("empty");
+                }, 5000);
             }
             
             /***** Methods *****/
@@ -239,7 +246,8 @@ define(function(require, exports, module) {
                     /**
                      * @event draw
                      */
-                    "draw"
+                    "draw",
+                    "empty"
                 ],
                 
                 getWindows: getWindows,
