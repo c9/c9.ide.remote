@@ -20,7 +20,7 @@ define(function(require, exports, module) {
             var plugin = new Plugin("Ajax.org", main.consumes);
             var emit   = plugin.getEmitter();
             
-            var sources = [];
+            var windows = [];
             var styleSheets, scripts, html;
             
             var loaded = false;
@@ -54,18 +54,8 @@ define(function(require, exports, module) {
                         scripts     = data.scripts.map(toPath);
                         html        = toPath(data.href);
                         
-                        if (sources.indexOf(e.source) == -1) {
-                            sources.push(e.source);
-                            if (!c9.hosted) {
-                                e.source.addEventListener("unload", function(){
-                                    var idx = sources.indexOf(this);
-                                    if (idx > -1) sources.splice(idx, 1);
-
-                                    if (!sources.length)
-                                        emit("empty");
-                                });
-                            }
-                        }
+                        if (windows.indexOf(e.source) == -1)
+                            windows.push(e.source);
                         
                         // Send available keys
                         e.source.postMessage({
@@ -108,9 +98,16 @@ define(function(require, exports, module) {
                 });
             }
             
-            function send(message){
-                sources.forEach(function(source){
-                    source.postMessage(message, "*");
+            function getWindows() {
+                windows = windows.filter(function(w) {
+                    return !w.closed;
+                });
+                return windows;
+            }
+            
+            function send(message) {
+                getWindows().forEach(function(w){
+                    w.postMessage(message, "*");
                 });
             }
             
@@ -238,14 +235,14 @@ define(function(require, exports, module) {
              * 
              **/
             plugin.freezePublicAPI({
-                get sources(){ return sources.slice(0); },
-                
                 _events : [
                     /**
                      * @event draw
                      */
                     "draw"
                 ],
+                
+                getWindows: getWindows,
                 
                 /**
                  * 
