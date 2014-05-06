@@ -6,15 +6,15 @@ define(function(require, exports, module) {
     return main;
 
     function main(options, imports, register) {
-        var Plugin     = imports.Plugin;
-        var watcher    = imports.watcher;
-        var fs         = imports.fs;
+        var Plugin = imports.Plugin;
+        var watcher = imports.watcher;
+        var fs = imports.fs;
         var tabManager = imports.tabManager;
         
         /***** Initialization *****/
         
         var plugin = new Plugin("Ajax.org", main.consumes);
-        // var emit   = plugin.getEmitter();
+        // var emit = plugin.getEmitter();
         
         var documents = {};
         
@@ -23,7 +23,7 @@ define(function(require, exports, module) {
             if (loaded) return false;
             loaded = true;
             
-            watcher.on("delete", function(e){
+            watcher.on("delete", function(e) {
                 var doc = documents[e.path];
                 if (!doc || doc.tab) return;
                 
@@ -33,24 +33,24 @@ define(function(require, exports, module) {
                 // doc.unload() ?? 
             }, plugin);
             
-            watcher.on("change", function(e){
+            watcher.on("change", function(e) {
                 var doc = documents[e.path];
                 if (!doc || doc.tab) return;
                 
-                fs.readFile(e.path, function(err, data){
+                fs.readFile(e.path, function(err, data) {
                     doc.update(null, data);
                 });
             }, plugin);
             
             // Listen for opening files
-            tabManager.on("open", function(e){
+            tabManager.on("open", function(e) {
                 var tab = e.tab;
                 var doc = tab.path && documents[tab.path];
                 if (doc) doc.tab = tab;
             }, plugin);
             
             // Listen for closing tabs
-            tabManager.on("tabDestroy", function(e){
+            tabManager.on("tabDestroy", function(e) {
                 var tab = e.tab;
                 var doc = tab.path && documents[tab.path];
                 if (doc) doc.tab = null;
@@ -59,7 +59,7 @@ define(function(require, exports, module) {
         
         /***** Methods *****/
         
-        function registerDocument(doc){
+        function registerDocument(doc) {
             documents[doc.path] = doc;
             watcher.watch(doc.path);
             
@@ -70,18 +70,18 @@ define(function(require, exports, module) {
             });
         }
         
-        function findDocument(path){
+        function findDocument(path) {
             return documents[path];
         }
         
-        // function isKnownFile(path){
+        // function isKnownFile(path) {
         //     var found;
             
         //     if (~session.href.indexOf(path))
         //         return { url: session.href, type: "html" }
             
         //     function search(arr, type) {
-        //         if (arr.some(function(p){
+        //         if (arr.some(function(p) {
         //             if (~p.indexOf(path)) {
         //                 found = p;
         //                 return true;
@@ -118,7 +118,7 @@ define(function(require, exports, module) {
         plugin.freezePublicAPI({
             get documents(){ return documents; },
             
-            _events : [
+            _events: [
                 /**
                  * @event draw
                  */

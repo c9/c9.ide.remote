@@ -6,19 +6,19 @@ define(function(require, exports, module) {
     return main;
 
     function main(options, imports, register) {
-        var Plugin   = imports.Plugin;
+        var Plugin = imports.Plugin;
         var commands = imports.commands;
-        var c9       = imports.c9;
+        var c9 = imports.c9;
         
         var previewBaseUrl = options.previewBaseUrl;
         
         var counter = 0;
         
-        function PostMessage(iframe, sessionId){
+        function PostMessage(iframe, sessionId) {
             /***** Initialization *****/
             
             var plugin = new Plugin("Ajax.org", main.consumes);
-            var emit   = plugin.getEmitter();
+            var emit = plugin.getEmitter();
             
             var windows = [];
             var styleSheets, scripts, html;
@@ -51,17 +51,17 @@ define(function(require, exports, module) {
                     else if (e.data.message == "html.ready") {
                         var data = e.data.data;
                         styleSheets = data.styles.map(toPath);
-                        scripts     = data.scripts.map(toPath);
-                        html        = toPath(data.href);
+                        scripts = data.scripts.map(toPath);
+                        html = toPath(data.href);
                         
                         if (windows.indexOf(e.source) == -1)
                             windows.push(e.source);
                         
                         // Send available keys
                         e.source.postMessage({
-                            id   : sessionId,
-                            type : "keys",
-                            keys : commands.getExceptionBindings()
+                            id: sessionId,
+                            type: "keys",
+                            keys: commands.getExceptionBindings()
                         }, "*");
                         
                         // todo: should this emit e, so that init messages are 
@@ -93,15 +93,15 @@ define(function(require, exports, module) {
             }
             
             var callbacks = [];
-            function wrapCallback(callback){
+            function wrapCallback(callback) {
                 return callbacks.push(callback) - 1;
             }
             
-            function getSources(callback){
+            function getSources(callback) {
                 return callback(null, {
-                    styleSheets : styleSheets,
-                    scripts     : scripts,
-                    html        : html
+                    styleSheets: styleSheets,
+                    scripts: scripts,
+                    html: html
                 });
             }
             
@@ -113,7 +113,7 @@ define(function(require, exports, module) {
             }
             
             function send(message) {
-                getWindows().forEach(function(w){
+                getWindows().forEach(function(w) {
                     w.postMessage(message, "*");
                 });
             }
@@ -122,20 +122,20 @@ define(function(require, exports, module) {
                 
             }
             
-            function getHTMLDocument(callback){
+            function getHTMLDocument(callback) {
                 var message = {
-                    id      : sessionId,
-                    type    : "simpledom",
-                    cb      : wrapCallback(callback)
+                    id: sessionId,
+                    type: "simpledom",
+                    cb: wrapCallback(callback)
                 };
                 send(message);
             }
             
-            function initHTMLDocument(dom){
+            function initHTMLDocument(dom) {
                 var message = {
-                    id      : sessionId,
-                    type    : "initdom",
-                    dom     : dom
+                    id: sessionId,
+                    type: "initdom",
+                    dom: dom
                 };
                 send(message);
             }
@@ -144,31 +144,31 @@ define(function(require, exports, module) {
                 
             }
             
-            function updateStyleSheet(path, value){
+            function updateStyleSheet(path, value) {
                 var message = {
-                    id      : sessionId,
-                    type    : "updatecss",
-                    path    : path,
-                    data    : value
+                    id: sessionId,
+                    type: "updatecss",
+                    path: path,
+                    data: value
                 };
                 send(message);
             }
             
-            function updateStyleRule(url, rule){
+            function updateStyleRule(url, rule) {
                 var message = {
-                    id      : sessionId,
-                    type    : "stylerule",
-                    url     : url,
-                    rule    : rule
+                    id: sessionId,
+                    type: "stylerule",
+                    url: url,
+                    rule: rule
                 };
                 send(message);
             }
             
-            function processDOMChanges(edits){
+            function processDOMChanges(edits) {
                 var message = {
-                    id      : sessionId,
-                    type    : "domedits",
-                    edits   : edits
+                    id: sessionId,
+                    type: "domedits",
+                    edits: edits
                 };
                 send(message);
             }
@@ -177,12 +177,12 @@ define(function(require, exports, module) {
                 
             }
             
-            function deleteStyleSheet(url){
+            function deleteStyleSheet(url) {
                 var message = {
-                    id      : sessionId,
-                    type    : "update",
-                    url     : url,
-                    del     : true
+                    id: sessionId,
+                    type: "update",
+                    url: url,
+                    del: true
                 };
                 send(message);
             }
@@ -193,30 +193,30 @@ define(function(require, exports, module) {
             
             function reload(){
                 var message = {
-                    id      : sessionId,
-                    type    : "reload"
+                    id: sessionId,
+                    type: "reload"
                 };
                 send(message);
             }
             
             var lastQuery;
-            function highlightCSSQuery(query, force){
+            function highlightCSSQuery(query, force) {
                 if (!force && lastQuery == query) return;
                 lastQuery = query;
                 
                 var message = {
-                    id      : sessionId,
-                    type    : "highlight",
-                    query   : query
+                    id: sessionId,
+                    type: "highlight",
+                    query: query
                 };
                 send(message);
             }
             
             function reveal(query) {
                 var message = {
-                    id      : sessionId,
-                    type    : "reveal",
-                    query   : query || lastQuery
+                    id: sessionId,
+                    type: "reveal",
+                    query: query || lastQuery
                 };
                 send(message);
             }
@@ -242,7 +242,7 @@ define(function(require, exports, module) {
              * 
              **/
             plugin.freezePublicAPI({
-                _events : [
+                _events: [
                     /**
                      * @event draw
                      */

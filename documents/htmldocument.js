@@ -6,13 +6,13 @@ define(function(require, exports, module) {
     return main;
 
     function main(options, imports, register) {
-        var Plugin   = imports.Plugin;
-        var remote   = imports.remote;
-        var watcher  = imports.watcher;
-        var save     = imports.save;
-        var fs       = imports.fs;
+        var Plugin = imports.Plugin;
+        var remote = imports.remote;
+        var watcher = imports.watcher;
+        var save = imports.save;
+        var fs = imports.fs;
         var commands = imports.commands;
-        var Range    = require("ace/range").Range;
+        var Range = require("ace/range").Range;
         
         var errorDialog = imports["dialog.error"];
         var HTMLInstrumentation 
@@ -20,14 +20,14 @@ define(function(require, exports, module) {
         
         var counter = 0;
         
-        function HTMLDocument(path){
+        function HTMLDocument(path) {
             var exists = remote.findDocument(path);
             if (exists) return exists;
             
             /***** Initialization *****/
             
             var plugin = new Plugin("Ajax.org", main.consumes);
-            // var emit   = plugin.getEmitter();
+            // var emit = plugin.getEmitter();
             
             var transports = [];
             var tab, doc, errors = {};
@@ -57,7 +57,7 @@ define(function(require, exports, module) {
             
             /***** Methods *****/
             
-            function addTransport(transport){
+            function addTransport(transport) {
                 if (transports.indexOf(transport) == -1) {
                     transports.push(transport);
                     
@@ -85,11 +85,11 @@ define(function(require, exports, module) {
                 return plugin;
             }
             
-            function initTab(t){
+            function initTab(t) {
                 if (!t) {
                     doc = null;
                     if (tab) {
-                        fs.readFile(path, function(err, data){
+                        fs.readFile(path, function(err, data) {
                             update(null, data);
                         });
                     }
@@ -127,7 +127,7 @@ define(function(require, exports, module) {
                 tab.on("close", function(){ watcher.watch(path); });
                 
                 // @Ruben is there a better way to listen for save event?
-                save.on("afterSave", function(e){
+                save.on("afterSave", function(e) {
                     if (e.document == doc) {
                         var session = doc.getSession().session;
                         if (session) {
@@ -165,7 +165,7 @@ define(function(require, exports, module) {
                 }
             }
             
-            function updateHighlight(e){
+            function updateHighlight(e) {
                 var query, tagId;
                 
                 if (tab && e !== false) {
@@ -189,12 +189,12 @@ define(function(require, exports, module) {
                 }
                 
                 // Send the highlight command
-                transports.forEach(function(transport){
+                transports.forEach(function(transport) {
                     transport.highlightCSSQuery(query, e === true);
                 });
             }
             
-            function update(e, value){
+            function update(e, value) {
                 var changes = e && e.data;
                 if (!changes) return; //@todo allow only value to be set
                 
@@ -210,7 +210,7 @@ define(function(require, exports, module) {
                 var result = HTMLInstrumentation.getUnappliedEditList(session, changes);
                 
                 if (result.edits && result.edits.length) {
-                    transports.forEach(function(transport){
+                    transports.forEach(function(transport) {
                         transport.processDOMChanges(result.edits, path);
                     });
                 }
@@ -254,7 +254,7 @@ define(function(require, exports, module) {
             
             function scrollIntoView() {
                 updateHighlight();
-                transports.forEach(function(transport){
+                transports.forEach(function(transport) {
                     transport.reveal();
                 });
             }
@@ -295,7 +295,7 @@ define(function(require, exports, module) {
                  */
                 set tab(tab){ initTab(tab); },
                 
-                _events : [
+                _events: [
                     /**
                      * @event draw
                      */

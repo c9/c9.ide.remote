@@ -6,24 +6,24 @@ define(function(require, exports, module) {
     return main;
 
     function main(options, imports, register) {
-        var Plugin   = imports.Plugin;
-        var remote   = imports.remote;
-        var watcher  = imports.watcher;
-        var fs       = imports.fs;
+        var Plugin = imports.Plugin;
+        var remote = imports.remote;
+        var watcher = imports.watcher;
+        var fs = imports.fs;
         
         var counter = 0;
         
         var style = document.createElement("style");
         document.documentElement.appendChild(style);
         
-        function CSSDocument(path){
+        function CSSDocument(path) {
             var exists = remote.findDocument(path);
             if (exists) return exists;
             
             /***** Initialization *****/
             
             var plugin = new Plugin("Ajax.org", main.consumes);
-            // var emit   = plugin.getEmitter();
+            // var emit = plugin.getEmitter();
             
             var transports = [];
             var tab, doc;
@@ -38,7 +38,7 @@ define(function(require, exports, module) {
             
             /***** Methods *****/
             
-            function addTransport(transport){
+            function addTransport(transport) {
                 if (transports.indexOf(transport) == -1) {
                     transports.push(transport);
                     
@@ -62,11 +62,11 @@ define(function(require, exports, module) {
                 return plugin;
             }
             
-            function initTab(t){
+            function initTab(t) {
                 if (!t) {
                     doc = null;
                     if (tab) {
-                        fs.readFile(path, function(err, data){
+                        fs.readFile(path, function(err, data) {
                             update(null, data);
                         });
                     }
@@ -81,7 +81,7 @@ define(function(require, exports, module) {
                 tab.on("deactivate", function(){ updateHighlight(false); }, plugin);
                 
                 var c9session = doc.getSession();
-                c9session.on("init", function(e){
+                c9session.on("init", function(e) {
                     // Listen for change in the document
                     e.session.on("change", function(e){ update(e.data); });
                     
@@ -95,15 +95,15 @@ define(function(require, exports, module) {
             
             var lastQuery;
             var reCssQuery = /(^|.*\})(.*)\{|\}/;
-            function updateHighlight(e){
+            function updateHighlight(e) {
                 var query;
                 
                 if (tab && e !== false) {
                     var session = doc.getSession().session;
                     if (!session) return;
                     
-                    var lines   = session.doc.$lines;
-                    var cursor  = session.selection.lead;
+                    var lines = session.doc.$lines;
+                    var cursor = session.selection.lead;
                     
                     if (!lines[cursor.row]) {
                         return; //@todo
@@ -146,19 +146,19 @@ define(function(require, exports, module) {
                 lastQuery = query;
                 
                 // Send the highlight command
-                transports.forEach(function(transport){
+                transports.forEach(function(transport) {
                     transport.highlightCSSQuery(query, e === true);
                 });
             }
             
             function remove(){
-                transports.forEach(function(transport){
+                transports.forEach(function(transport) {
                     transport.deleteStyleSheet(path);
                 });
             }
             
             // var timer, lastValue;
-            // function updateDelayed(changes, value){
+            // function updateDelayed(changes, value) {
             //     if (!timer) {
             //         timer = setTimeout(function(){
             //             timer = null;
@@ -170,7 +170,7 @@ define(function(require, exports, module) {
             //     }
             // }
             
-            function update(changes, value){
+            function update(changes, value) {
                 // single line
                 // {
                 // action: "insertText" | "removeText"
@@ -188,11 +188,11 @@ define(function(require, exports, module) {
                 if (changes && lastQuery && changes.text && range.start.row == range.end.row 
                   && (changes.text != "insertText" || changes.text.indexOf(";") == -1)) {
                     var session = doc.getSession().session;
-                    var line    = session.doc.$lines[range.end.row];
+                    var line = session.doc.$lines[range.end.row];
                     var section = changes.action == "insertText"
                         ? line.substr(range.start.column, range.end.column - range.start.column) //changes.text
                         : "";
-                    var idx     = section.indexOf(";");
+                    var idx = section.indexOf(";");
                     
                     // Only allow a single rule edit
                     if (idx == -1 || idx == section.length - 1) {
@@ -213,16 +213,16 @@ define(function(require, exports, module) {
                         }
                         
                         var parts = section.split(":");
-                        var key   = parts[0].trim();
-                        var css   = (parts[1] || "").trim();
+                        var key = parts[0].trim();
+                        var css = (parts[1] || "").trim();
                         if (key) {
                             var rule = {
-                                selector : lastQuery,
-                                key      : key,
-                                value    : css
+                                selector: lastQuery,
+                                key: key,
+                                value: css
                             };
                             
-                            transports.forEach(function(transport){
+                            transports.forEach(function(transport) {
                                 transport.updateStyleRule(path, rule);
                             });
                         
@@ -231,7 +231,7 @@ define(function(require, exports, module) {
                     }
                 }
                 
-                transports.forEach(function(transport){
+                transports.forEach(function(transport) {
                     transport.updateStyleSheet(path, value || doc.value);
                 });
             }
@@ -272,7 +272,7 @@ define(function(require, exports, module) {
                  */
                 set tab(tab){ initTab(tab); },
                 
-                _events : [
+                _events: [
                     /**
                      * @event draw
                      */

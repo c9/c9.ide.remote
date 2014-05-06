@@ -6,19 +6,19 @@ define(function(require, exports, module) {
     return main;
 
     function main(options, imports, register) {
-        var Plugin   = imports.Plugin;
-        var remote   = imports.remote;
+        var Plugin = imports.Plugin;
+        var remote = imports.remote;
         
         var counter = 0;
         
-        function JSDocument(path){
+        function JSDocument(path) {
             var exists = remote.findDocument(path);
             if (exists) return exists;
             
             /***** Initialization *****/
             
             var plugin = new Plugin("Ajax.org", main.consumes);
-            // var emit   = plugin.getEmitter();
+            // var emit = plugin.getEmitter();
             
             var transports = [];
             var tab;
@@ -33,7 +33,7 @@ define(function(require, exports, module) {
             
             /***** Methods *****/
             
-            function addTransport(transport){
+            function addTransport(transport) {
                 if (transports.indexOf(transport) == -1) {
                     transports.push(transport);
                     
@@ -51,14 +51,14 @@ define(function(require, exports, module) {
                 return plugin;
             }
             
-            function initTab(t){
+            function initTab(t) {
                 tab = t;
                 if (!tab) return;
                 
                 var undo = t.document.undoManager;
                 undo.on("change", function(){
                     if (undo.isAtBookmark()) {
-                        transports.forEach(function(transport){
+                        transports.forEach(function(transport) {
                             transport.reload();
                         });
                     }
@@ -66,7 +66,7 @@ define(function(require, exports, module) {
             }
             
             function remove(){
-                transports.forEach(function(transport){
+                transports.forEach(function(transport) {
                     transport.deleteStyleSheet(path);
                 });
             }
@@ -107,7 +107,7 @@ define(function(require, exports, module) {
                  */
                 set tab(tab){ initTab(tab); },
                 
-                _events : [
+                _events: [
                     /**
                      * @event draw
                      */
