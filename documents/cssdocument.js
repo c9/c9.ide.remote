@@ -81,7 +81,7 @@ define(function(require, exports, module) {
                 tab.on("deactivate", function(){ updateHighlight(false); }, plugin);
                 
                 var c9session = doc.getSession();
-                c9session.on("init", function(e) {
+                c9session.once("init", function(e) {
                     // Listen for change in the document
                     e.session.on("change", function(e){ update(e.data); });
                     

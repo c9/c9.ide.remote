@@ -102,7 +102,7 @@ define(function(require, exports, module) {
                 
                 // Listen for change in the document
                 var c9session = doc.getSession();
-                c9session.on("init", function(e) {
+                c9session.once("init", function(e) {
                     e.session.on("change", update);
                     e.session.selection.on("changeCursor", updateHighlight);
                     e.session.savedDom = null;
