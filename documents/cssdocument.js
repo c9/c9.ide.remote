@@ -137,7 +137,7 @@ define(function(require, exports, module) {
                     query = false;
                 }
                 
-                if (query) {
+                if (query && style.sheet.rules.length) {
                     style.textContent = query + "{}";
                     query = style.sheet.rules[0].selectorText;
                 }
