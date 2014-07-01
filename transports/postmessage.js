@@ -22,6 +22,7 @@ define(function(require, exports, module) {
             
             var windows = [];
             var styleSheets, scripts, html;
+            var enableHighlighting = true;
             
             var loaded = false;
             function load() {
@@ -201,7 +202,9 @@ define(function(require, exports, module) {
             
             var lastQuery;
             function highlightCSSQuery(query, force) {
-                if (!force && lastQuery == query) return;
+                if (!force && lastQuery == query || !enableHighlighting) 
+                    return;
+                    
                 lastQuery = query;
                 
                 var message = {
@@ -242,6 +245,15 @@ define(function(require, exports, module) {
              * 
              **/
             plugin.freezePublicAPI({
+                /**
+                 * 
+                 */
+                get enableHighlighting(){ return enableHighlighting; },
+                set enableHighlighting(v){ 
+                    if (!v) highlightCSSQuery();
+                    enableHighlighting = v;
+                },
+                
                 _events: [
                     /**
                      * @event draw

@@ -37,21 +37,6 @@ define(function(require, exports, module) {
                 if (loaded) return false;
                 loaded = true;
                 
-                // todo what is proper place for this?
-                commands.addCommand({
-                    name: "scrollPreviewElementIntoView",
-                    displayName: "Preview:scroll element into view",
-                    bindKey: {win: "Ctrl-I", mac: "Ctrl-I"},
-                    exec: function(editor) {
-                        editor.ace.session.htmldocument.scrollIntoView();
-                    },
-                    isAvailable: function(editor) {
-                        if (editor && editor.ace && editor.ace.session.htmldocument) {
-                            return true;
-                        }
-                    }
-                }, plugin);
-                
                 remote.register(plugin);
             }
             
@@ -120,6 +105,7 @@ define(function(require, exports, module) {
                     });
                 });
                 
+                tab.editor.ace.on("focus", function(){ updateHighlight(true); }, plugin);
                 tab.on("activate", function(){ updateHighlight(); }, plugin);
                 tab.on("deactivate", function(){ updateHighlight(false); }, plugin);
                 
