@@ -27,10 +27,10 @@ define(function(require, exports, module) {
                 var doc = documents[e.path];
                 if (!doc || doc.tab) return;
                 
-                doc.remove();
-                
-                //@todo
-                // doc.unload() ?? 
+                // some documents e.g cssdocument needs to remove itself from active previews
+                // @todo should we call doc.unload() instead ?? 
+                if (doc.remove)
+                    doc.remove();
             }, plugin);
             
             watcher.on("change", function(e) {
