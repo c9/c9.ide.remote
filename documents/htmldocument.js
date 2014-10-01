@@ -18,8 +18,6 @@ define(function(require, exports, module) {
         var HTMLInstrumentation 
             = require("../../c9.ide.language.html.diff/HTMLInstrumentation");
         
-        var counter = 0;
-        
         function HTMLDocument(path) {
             var exists = remote.findDocument(path);
             if (exists) return exists;
@@ -304,7 +302,7 @@ define(function(require, exports, module) {
                 scrollIntoView: scrollIntoView
             });
             
-            plugin.load("htmldocument" + counter++);
+            plugin.load(null, "htmldocument");
             
             return plugin;
         }

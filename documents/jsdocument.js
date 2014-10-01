@@ -9,8 +9,6 @@ define(function(require, exports, module) {
         var Plugin = imports.Plugin;
         var remote = imports.remote;
         
-        var counter = 0;
-        
         function JSDocument(path) {
             var exists = remote.findDocument(path);
             if (exists) return exists;
@@ -125,7 +123,7 @@ define(function(require, exports, module) {
                 remove: remove
             });
             
-            plugin.load("jsdocument" + counter++);
+            plugin.load(null, "jsdocument");
             
             return plugin;
         }

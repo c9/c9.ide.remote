@@ -335,7 +335,7 @@ define(function(require, exports, module) {
                 reveal: reveal
             });
             
-            plugin.load("postmessage" + counter++);
+            plugin.load(null, "postmessage");
             
             return plugin;
         }

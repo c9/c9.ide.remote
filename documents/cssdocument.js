@@ -11,8 +11,6 @@ define(function(require, exports, module) {
         var watcher = imports.watcher;
         var fs = imports.fs;
         
-        var counter = 0;
-        
         var style = document.createElement("style");
         document.documentElement.appendChild(style);
         
@@ -295,7 +293,7 @@ define(function(require, exports, module) {
                 update: update
             });
             
-            plugin.load("cssdocument" + counter++);
+            plugin.load(null, "cssdocument");
             
             return plugin;
         }
