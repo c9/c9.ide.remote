@@ -178,8 +178,7 @@ define(function(require, exports, module) {
                 });
             }
             
-            function update(e, value) {
-                var changes = e && e.data;
+            function update(changes, value) {
                 if (!changes) return; //@todo allow only value to be set
                 
                 // Calculate changes
