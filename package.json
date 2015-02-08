@@ -9,14 +9,12 @@
         "url": "http://github.com/c9/c9.ide.remote.git"
     },
     "plugins": {
-        "plugin": {
-            "manager": {}
-        }
+        "manager": {}
     },
     "categories": [
         "core"
     ],
     "licenses": [
-        ""
+        "MIT"
     ]
 }
