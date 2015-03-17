@@ -30,7 +30,7 @@ define(function(require, exports, module) {
                 loaded = true;
                 
                 var onMessage = function(e) {
-                    if (c9.hosted && event.origin !== previewBaseUrl)
+                    if (c9.hosted && e.origin !== previewBaseUrl)
                         return;
                     
                     if (sessionId != e.data.id)
