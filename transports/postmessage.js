@@ -108,7 +108,7 @@ define(function(require, exports, module) {
             
             function getWindows() {
                 windows = windows.filter(function(w) {
-                    return !w.closed;
+                    return w && !w.closed;
                 });
                 return windows;
             }
