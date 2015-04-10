@@ -135,9 +135,10 @@ define(function(require, exports, module) {
                     query = false;
                 }
                 
-                if (query && style.sheet.rules.length) {
+                var rules = style.sheet.cssRules || style.sheet.rules;
+                if (query && rules.length) {
                     style.textContent = query + "{}";
-                    query = style.sheet.rules[0].selectorText;
+                    query = rules[0].selectorText;
                 }
                 
                 // Remember the last query
