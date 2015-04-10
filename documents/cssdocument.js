@@ -230,8 +230,10 @@ define(function(require, exports, module) {
                     }
                 }
                 
+                if (value == undefined)
+                    value = doc && doc.value || "";
                 transports.forEach(function(transport) {
-                    transport.updateStyleSheet(path, value || doc.value);
+                    transport.updateStyleSheet(path, value);
                 });
             }
             
