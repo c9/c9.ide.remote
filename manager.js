@@ -40,8 +40,8 @@ define(function(require, exports, module) {
                 
                 
                 fs.readFile(e.path, function(err, data) {
-                    if (!doc.update) {
-                        return errorHandler.log(new Error("Document has no update function"), {path: e.path, err: err, doc: doc})
+                    if (typeof doc.update !== "function") {
+                        return errorHandler.log(new Error("Tracked: doc.update is not a function"), {path: e.path, err: err, doc: doc});
                     }
                     doc.update(null, data);
                 });
