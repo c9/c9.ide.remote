@@ -1,6 +1,6 @@
 define(function(require, exports, module) {
     main.consumes = [
-        "Plugin", "watcher", "tabManager", "fs"
+        "Plugin", "watcher", "tabManager", "fs", "error_handler"
     ];
     main.provides = ["remote"];
     return main;
@@ -10,6 +10,7 @@ define(function(require, exports, module) {
         var watcher = imports.watcher;
         var fs = imports.fs;
         var tabManager = imports.tabManager;
+        var errorHandler = imports.error_handler;
         
         /***** Initialization *****/
         
@@ -37,7 +38,11 @@ define(function(require, exports, module) {
                 var doc = documents[e.path];
                 if (!doc || doc.tab) return;
                 
+                
                 fs.readFile(e.path, function(err, data) {
+                    if (!doc.update) {
+                        return errorHandler.log(new Error("Document has no update function"), {path: e.path, err: err, doc: doc})
+                    }
                     doc.update(null, data);
                 });
             }, plugin);
