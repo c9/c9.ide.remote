@@ -72,7 +72,7 @@ define(function(require, exports, module) {
                 };
                 
                 window.addEventListener("message", onMessage, false);
-                plugin.addOther(function(){
+                plugin.addOther(function() {
                     window.removeEventListener("message", onMessage, false);
                 });
                 
@@ -119,7 +119,7 @@ define(function(require, exports, module) {
                 });
             }
             
-            function getStyleSheet(){
+            function getStyleSheet() {
                 
             }
             
@@ -141,7 +141,7 @@ define(function(require, exports, module) {
                 send(message);
             }
             
-            function getScript(){
+            function getScript() {
                 
             }
             
@@ -174,7 +174,7 @@ define(function(require, exports, module) {
                 send(message);
             }
             
-            function updateScript(){
+            function updateScript() {
                 
             }
             
@@ -188,11 +188,11 @@ define(function(require, exports, module) {
                 send(message);
             }
             
-            function deleteScript(){
+            function deleteScript() {
                 
             }
             
-            function reload(){
+            function reload() {
                 var message = {
                     id: sessionId,
                     type: "reload"
@@ -248,8 +248,8 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
-                get enableHighlighting(){ return enableHighlighting; },
-                set enableHighlighting(v){ 
+                get enableHighlighting() { return enableHighlighting; },
+                set enableHighlighting(v) { 
                     if (!v) highlightCSSQuery();
                     enableHighlighting = v;
                 },

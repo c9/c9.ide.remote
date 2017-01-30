@@ -40,7 +40,7 @@ define(function(require, exports, module) {
                 if (transports.indexOf(transport) == -1) {
                     transports.push(transport);
                     
-                    transport.addOther(function(){
+                    transport.addOther(function() {
                         var idx = transports.indexOf(transport);
                         if (~idx) {
                             transports.splice(idx, 1);
@@ -75,20 +75,20 @@ define(function(require, exports, module) {
                 tab = t;
                 doc = tab.document;
                 
-                tab.on("activate", function(){ updateHighlight(); }, plugin);
-                tab.on("deactivate", function(){ updateHighlight(false); }, plugin);
+                tab.on("activate", function() { updateHighlight(); }, plugin);
+                tab.on("deactivate", function() { updateHighlight(false); }, plugin);
                 
                 var c9session = doc.getSession();
                 c9session.once("init", function(e) {
                     // Listen for change in the document
-                    e.session.on("change", function(e){ update(e.data); });
+                    e.session.on("change", function(e) { update(e.data); });
                     
                     // Listen for cursor position change
                     e.session.selection.on("changeCursor", updateHighlight);
                 });
                 
                 // Listen for a tab close event
-                tab.on("close", function(){ watcher.watch(path); }, plugin);
+                tab.on("close", function() { watcher.watch(path); }, plugin);
             }
             
             var lastQuery;
@@ -150,7 +150,7 @@ define(function(require, exports, module) {
                 });
             }
             
-            function remove(){
+            function remove() {
                 transports.forEach(function(transport) {
                     transport.deleteStyleSheet(path);
                 });
@@ -261,17 +261,17 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
-                get path(){ return path; },
+                get path() { return path; },
                 
                 /**
                  * 
                  */
-                get tab(){ return tab; },
+                get tab() { return tab; },
                 
                 /**
                  * 
                  */
-                set tab(tab){ initTab(tab); },
+                set tab(tab) { initTab(tab); },
                 
                 _events: [
                     /**

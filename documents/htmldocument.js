@@ -44,7 +44,7 @@ define(function(require, exports, module) {
                 if (transports.indexOf(transport) == -1) {
                     transports.push(transport);
                     
-                    transport.addOther(function(){
+                    transport.addOther(function() {
                         var idx = transports.indexOf(transport);
                         if (~idx) {
                             transports.splice(idx, 1);
@@ -103,12 +103,12 @@ define(function(require, exports, module) {
                     });
                 });
                 
-                tab.editor.ace.on("focus", function(){ updateHighlight(true); }, plugin);
-                tab.on("activate", function(){ updateHighlight(); }, plugin);
-                tab.on("deactivate", function(){ updateHighlight(false); }, plugin);
+                tab.editor.ace.on("focus", function() { updateHighlight(true); }, plugin);
+                tab.on("activate", function() { updateHighlight(); }, plugin);
+                tab.on("deactivate", function() { updateHighlight(false); }, plugin);
                 
                 // Listen for a tab close event
-                tab.on("close", function(){ watcher.watch(path); });
+                tab.on("close", function() { watcher.watch(path); });
                 
                 // @Ruben is there a better way to listen for save event?
                 save.on("afterSave", function(e) {
@@ -266,17 +266,17 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
-                get path(){ return path; },
+                get path() { return path; },
                 
                 /**
                  * 
                  */
-                get tab(){ return tab; },
+                get tab() { return tab; },
                 
                 /**
                  * 
                  */
-                set tab(tab){ initTab(tab); },
+                set tab(tab) { initTab(tab); },
                 
                 _events: [
                     /**

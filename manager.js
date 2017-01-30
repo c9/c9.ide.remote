@@ -41,7 +41,7 @@ define(function(require, exports, module) {
                 
                 fs.readFile(e.path, function(err, data) {
                     if (typeof doc.update !== "function") {
-                        return errorHandler.log(new Error("Tracked: doc.update is not a function"), {path: e.path, err: err, doc: doc});
+                        return errorHandler.log(new Error("Tracked: doc.update is not a function"), { path: e.path, err: err, doc: doc });
                     }
                     doc.update(null, data);
                 });
@@ -70,7 +70,7 @@ define(function(require, exports, module) {
             
             doc.tab = tabManager.findTab(doc.path);
             
-            doc.addOther(function(){
+            doc.addOther(function() {
                 delete documents[doc.path];
             });
         }
@@ -121,7 +121,7 @@ define(function(require, exports, module) {
          * 
          **/
         plugin.freezePublicAPI({
-            get documents(){ return documents; },
+            get documents() { return documents; },
             
             _events: [
                 /**

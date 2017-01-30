@@ -35,7 +35,7 @@ define(function(require, exports, module) {
                 if (transports.indexOf(transport) == -1) {
                     transports.push(transport);
                     
-                    transport.addOther(function(){
+                    transport.addOther(function() {
                         var idx = transports.indexOf(transport);
                         if (~idx) {
                             transports.splice(idx, 1);
@@ -54,7 +54,7 @@ define(function(require, exports, module) {
                 if (!tab) return;
                 
                 var undo = t.document.undoManager;
-                undo.on("change", function(){
+                undo.on("change", function() {
                     if (undo.isAtBookmark()) {
                         transports.forEach(function(transport) {
                             transport.reload();
@@ -63,7 +63,7 @@ define(function(require, exports, module) {
                 }, tab);
             }
             
-            function remove(){
+            function remove() {
                 transports.forEach(function(transport) {
                     transport.deleteStyleSheet(path);
                 });
@@ -93,17 +93,17 @@ define(function(require, exports, module) {
                 /**
                  * 
                  */
-                get path(){ return path; },
+                get path() { return path; },
                 
                 /**
                  * 
                  */
-                get tab(){ return tab; },
+                get tab() { return tab; },
                 
                 /**
                  * 
                  */
-                set tab(tab){ initTab(tab); },
+                set tab(tab) { initTab(tab); },
                 
                 _events: [
                     /**
